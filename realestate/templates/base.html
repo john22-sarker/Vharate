@@ -267,12 +267,18 @@
 
 
 <!-- Main Content -->
-<main class="" style="    padding: 100px 0 100px;">
+<style>
+@media (max-width: 768px) {
+    #main-section12345 {
+        padding: 0 !important;
+    }
+}
+</style>
+
+<main id="main-section12345" style="padding: 85px 0 100px;">
     {% block content %}
-    <!-- Page-specific content will go here -->
     {% endblock %}
 </main>
-
 
 
 
