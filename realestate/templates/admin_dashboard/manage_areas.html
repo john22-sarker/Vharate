@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2 class="mb-4">Manage Areas</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <h5>Add New Area</h5>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-success">Add Area</button>
+        </form>
+    </div>
+</div>
+
+<hr>
+<h5>Existing Areas</h5>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>City</th>
+            <th>Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for area in areas %}
+        <tr>
+            <td>{{ area.id }}</td>
+            <td>{{ area.city.name }}</td>
+            <td>{{ area.name }}</td>
+            <td>
+                <a href="{% url 'admin_dashboard:edit_area' area.id %}" class="btn btn-sm btn-warning">Edit</a>
+                <a href="{% url 'admin_dashboard:delete_area' area.id %}" class="btn btn-sm btn-danger">Delete</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">No areas found.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

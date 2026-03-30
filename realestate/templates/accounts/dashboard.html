@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<section class="our-dashbord dashbord bgc-fa pb50">
+    <div class="container">
+        <div class="row">
+
+            <!-- ========================= -->
+            <!-- DASHBOARD STATS -->
+            <!-- ========================= -->
+            <div class="col-lg-12">
+                <div class="row">
+
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="ff_one">
+                            <div class="details">
+                                <h3>{{ total_properties }}</h3>
+                                <p>Total Properties</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="ff_one style2">
+                            <div class="details">
+                                <h3>{{ active_properties }}</h3>
+                                <p>Active Properties</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="ff_one style3">
+                            <div class="details">
+                                <h3>{{ inactive_properties }}</h3>
+                                <p>Inactive Properties</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ========================= -->
+            <!-- PROFILE UPDATE -->
+            <!-- ========================= -->
+            <div class="col-lg-12">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="my_dashboard_review mt30">
+                        <div class="row">
+                            <div class="col-xl-2">
+                                <h4>My Profile</h4>
+                            </div>
+                            <div class="col-xl-10">
+                                <div class="row">
+
+                                    <div class="col-lg-6">
+                                        <label>Full Name</label>
+                                        {{ profile_update_form.full_name }}
+                                    </div>
+
+                                    <div class="col-lg-6">
+                                        <label>Phone</label>
+                                        {{ profile_update_form.phone_number }}
+                                    </div>
+
+                                    <div class="col-lg-12">
+                                        <label>Email</label>
+                                        {{ profile_update_form.email }}
+                                    </div>
+
+                                    <div class="col-xl-12 mt-3">
+                                        <button type="submit" name="update_profile" class="btn btn2">
+                                            Update Profile
+                                        </button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ========================= -->
+            <!-- PHOTO UPDATE -->
+            <!-- ========================= -->
+            <div class="col-lg-12">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="my_dashboard_review mt30">
+                        <div class="row">
+                            <div class="col-xl-2">
+                                <h4>Profile Photo</h4>
+                            </div>
+                            <div class="col-xl-10">
+
+                                {% if profile.photo %}
+                                    <img src="{{ profile.photo.url }}" width="120" class="mb-3">
+                                {% endif %}
+
+                                <input type="file" name="photo" class="form-control mb-2">
+
+                                <button type="submit" name="update_photo" class="btn btn2">
+                                    Upload Photo
+                                </button>
+
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ========================= -->
+            <!-- PASSWORD CHANGE -->
+            <!-- ========================= -->
+            <div class="col-lg-12">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="my_dashboard_review mt30">
+                        <div class="row">
+                            <div class="col-xl-2">
+                                <h4>Change Password</h4>
+                            </div>
+                            <div class="col-xl-10">
+                                <div class="row">
+
+                                    <div class="col-lg-6">
+                                        <label>Old Password</label>
+                                        <input type="password" name="old_password" class="form-control">
+                                    </div>
+
+                                    <div class="col-lg-6">
+                                        <label>New Password</label>
+                                        <input type="password" name="new_password1" class="form-control">
+                                    </div>
+
+                                    <div class="col-lg-6 mt-3">
+                                        <label>Confirm Password</label>
+                                        <input type="password" name="new_password2" class="form-control">
+                                    </div>
+
+                                    <div class="col-xl-12 mt-3">
+                                        <button type="submit" name="change_password" class="btn btn2">
+                                            Change Password
+                                        </button>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- ========================= -->
+            <!-- PROPERTY LIST -->
+            <!-- ========================= -->
+            <div class="col-lg-12">
+                <div class="my_dashboard_review mt30">
+                    <h4>My Properties</h4>
+
+                    {% for property in properties %}
+                        <div class="card mb-3 p-3">
+
+                            <!-- 🔗 TITLE CLICKABLE -->
+                            <h5>
+                                <a href="{% url 'properties:property_detail' property.slug %}">
+                                    {{ property.title }}
+                                </a>
+                            </h5>
+
+                            <p><strong>Price:</strong> {{ property.price }}</p>
+
+                            <p>
+                                <strong>Status:</strong>
+                                {% if property.is_published %}
+                                    <span class="text-success">Active</span>
+                                {% else %}
+                                    <span class="text-danger">Inactive</span>
+                                {% endif %}
+                            </p>
+
+                            <!-- ACTION BUTTONS -->
+                            <div class="mt-2">
+
+                                <!-- EDIT -->
+                                <a href="{% url 'properties:edit_property' property.slug %}" 
+                                   class="btn btn-sm btn-primary">
+                                    Edit
+                                </a>
+
+                                <!-- DELETE -->
+                                <form method="POST" 
+                                      action="{% url 'properties:delete_property' property.slug %}" 
+                                      style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" 
+                                            class="btn btn-sm btn-danger"
+                                            onclick="return confirm('Are you sure?');">
+                                        Delete
+                                    </button>
+                                </form>
+
+                                <!-- TOGGLE -->
+                                <form method="POST" 
+                                      action="{% url 'properties:toggle_property_status' property.slug %}" 
+                                      style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-warning">
+                                        {% if property.is_published %}
+                                            Deactivate
+                                        {% else %}
+                                            Activate
+                                        {% endif %}
+                                    </button>
+                                </form>
+
+                            </div>
+
+                        </div>
+                    {% empty %}
+                        <p>No properties found.</p>
+                    {% endfor %}
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,319 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="wrapper">
+	<div class="preloader"></div>
+
+	<section class="our-listing bgc-f7 pb30-991">
+		<div class="container">
+
+			<!-- HEADER -->
+			<div class="row">
+				<div class="col-lg-6">
+					<div class="breadcrumb_content style2 mt30-767 mb30-767">
+						<h2 class="breadcrumb_title">Properties</h2>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+
+				<!-- ================= SIDEBAR ================= -->
+				<div class="col-lg-4 col-xl-4">
+					<div class="sidebar_listing_list dn-991">
+						<div class="sidebar_advanced_search_widget">
+
+							<form method="get" id="filterForm">
+								<ul class="sasw_list mb0">
+
+									<!-- SEARCH -->
+									<li class="search_area">
+										<div class="form-group">
+											<input type="text" name="q" class="form-control"
+												placeholder="Search..."
+												value="{{ query }}">
+											<label><span class="flaticon-magnifying-glass"></span></label>
+										</div>
+									</li>
+
+									<!-- PROPERTY TYPE -->
+									<li>
+										<div class="search_option_two">
+											<select name="property_type" class="selectpicker w100 show-tick">
+												<option value="">Property Type</option>
+												<option value="Apartment" {% if filters.property_type == "Apartment" %}selected{% endif %}>Apartment</option>
+												<option value="Family House" {% if filters.property_type == "Family House" %}selected{% endif %}>Family House</option>
+												<option value="Bachelor House" {% if filters.property_type == "Bachelor House" %}selected{% endif %}>Bachelor House</option>
+											</select>
+										</div>
+									</li>
+
+									<!-- CITY -->
+									<li>
+										<div class="search_option_two">
+											<select name="city" id="city" class="selectpicker w100 show-tick">
+												<option value="">All Cities</option>
+												{% for city in cities %}
+													<option value="{{ city.id }}"
+														{% if filters.city == city.id|stringformat:"s" %}selected{% endif %}>
+														{{ city.name }}
+													</option>
+												{% endfor %}
+											</select>
+										</div>
+									</li>
+
+									<!-- AREA -->
+									<li>
+										<div class="search_option_two">
+											<select name="area" id="area" class="selectpicker w100 show-tick">
+												<option value="">All Areas</option>
+												{% for area in areas %}
+													<option value="{{ area.id }}"
+														{% if filters.area == area.id|stringformat:"s" %}selected{% endif %}>
+														{{ area.name }}
+													</option>
+												{% endfor %}
+											</select>
+										</div>
+									</li>
+
+									<!-- SUBAREA (NEW) -->
+									<li>
+										<div class="search_option_two">
+											<select name="subarea" id="subarea" class="selectpicker w100 show-tick">
+												<option value="">All SubAreas</option>
+												{% for sub in subareas %}
+													<option value="{{ sub.id }}"
+														{% if filters.subarea == sub.id|stringformat:"s" %}selected{% endif %}>
+														{{ sub.name }}
+													</option>
+												{% endfor %}
+											</select>
+										</div>
+									</li>
+
+									<!-- PRICE -->
+									<li>
+										<div class="small_dropdown2">
+											<div class="dd_content2 style2">
+												<div class="pricing_acontent">
+													<input type="number" name="price_min" placeholder="Min Price"
+														value="{{ filters.price_min }}">
+													<input type="number" name="price_max" placeholder="Max Price"
+														value="{{ filters.price_max }}">
+												</div>
+											</div>
+										</div>
+									</li>
+
+									<!-- BATHROOMS -->
+									<li>
+										<div class="search_option_two">
+											<select name="bathrooms" class="selectpicker w100 show-tick">
+												<option value="">Bathrooms</option>
+												{% for i in "123456"|make_list %}
+													<option value="{{ i }}"
+														{% if filters.bathrooms == i %}selected{% endif %}>
+														{{ i }}
+													</option>
+												{% endfor %}
+											</select>
+										</div>
+									</li>
+
+									<!-- BEDROOMS -->
+									<li>
+										<div class="search_option_two">
+											<select name="bedrooms" class="selectpicker w100 show-tick">
+												<option value="">Bedrooms</option>
+												{% for i in "123456"|make_list %}
+													<option value="{{ i }}"
+														{% if filters.bedrooms == i %}selected{% endif %}>
+														{{ i }}
+													</option>
+												{% endfor %}
+											</select>
+										</div>
+									</li>
+
+									<!-- SUBMIT -->
+									<li>
+										<div class="search_option_button">
+											<button type="submit" class="btn btn-block btn-thm">
+												Search
+											</button>
+										</div>
+									</li>
+
+								</ul>
+							</form>
+
+						</div>
+					</div>
+				</div>
+
+				<!-- ================= PROPERTY LIST ================= -->
+				<div class="col-md-12 col-lg-8">
+
+					<p>{{ page_obj.paginator.count }} Search results</p>
+
+					<div class="row">
+
+	{% for property in properties %}
+	<div class="col-md-6 col-lg-6">
+		<div class="feat_property home7">
+
+			<div class="thumb">
+				<img class="img-whp"
+					 src="{{ property.main_image.url }}"
+					 alt="{{ property.title }}">
+
+				<div class="thmb_cntnt">
+					<ul class="tag mb0">
+						<li class="list-inline-item">
+							<a href="#">{{ property.property_type }}</a>
+						</li>
+						<li class="list-inline-item dn"></li>
+					</ul>
+
+					<ul class="icon mb0">
+						<li class="list-inline-item">
+							<a href="#"><span class="flaticon-transfer-1"></span></a>
+						</li>
+						<li class="list-inline-item">
+							<a href="#"><span class="flaticon-heart"></span></a>
+						</li>
+					</ul>
+
+					<a class="fp_price" href="#">
+						{{ property.price }}<small>/mo</small>
+					</a>
+				</div>
+			</div>
+
+			<div class="details">
+				<div class="tc_content">
+					<p class="text-thm">{{ property.property_type }}</p>
+
+					<h4>
+						<a href="{% url 'properties:property_detail' property.slug %}">
+							{{ property.title }}
+						</a>
+					</h4>
+
+					<p>
+						<span class="flaticon-placeholder"></span>
+						{{ property.city.name }}, {{ property.area.name }}
+					</p>
+
+					<ul class="prop_details mb0">
+						<li class="list-inline-item">
+							<a class="text-thm3" href="#">Beds: {{ property.rooms }}</a>
+						</li>
+						<li class="list-inline-item">
+							<a class="text-thm3" href="#">Baths: {{ property.bathrooms }}</a>
+						</li>
+						<li class="list-inline-item">
+							<a class="text-thm3" href="#">Sq Ft: {{ property.size_sqft }}</a>
+						</li>
+					</ul>
+				</div>
+
+				<div class="fp_footer">
+					<ul class="fp_meta float-left mb0">
+						<li class="list-inline-item">
+							<a href="#">
+								<img src="{% if property.owner_image %}{{ property.owner_image.url }}{% else %}/static/images/property/pposter1.png{% endif %}" alt="owner">
+							</a>
+						</li>
+						<li class="list-inline-item">
+							<a href="#">{{ property.contact_name }}</a>
+						</li>
+					</ul>
+
+					<div class="fp_pdate float-right">
+						{{ property.created_at|timesince }} ago
+					</div>
+				</div>
+			</div>
+
+		</div>
+	</div>
+	{% empty %}
+	<div class="col-12">
+		<p>No properties found.</p>
+	</div>
+	{% endfor %}
+
+	<div class="col-lg-12 mt20">
+		<div class="mbp_pagination">
+			<ul class="page_navigation">
+
+				{% if page_obj.has_previous %}
+				<li class="page-item">
+					<a class="page-link" href="?page={{ page_obj.previous_page_number }}">
+						<span class="flaticon-left-arrow"></span> Prev
+					</a>
+				</li>
+				{% else %}
+				<li class="page-item disabled">
+					<a class="page-link" href="#">
+						<span class="flaticon-left-arrow"></span> Prev
+					</a>
+				</li>
+				{% endif %}
+
+				{% for num in page_obj.paginator.page_range %}
+				<li class="page-item {% if page_obj.number == num %}active{% endif %}">
+					<a class="page-link" href="?page={{ num }}">{{ num }}</a>
+				</li>
+				{% endfor %}
+
+				{% if page_obj.has_next %}
+				<li class="page-item">
+					<a class="page-link" href="?page={{ page_obj.next_page_number }}">
+						<span class="flaticon-right-arrow"></span>
+					</a>
+				</li>
+				{% else %}
+				<li class="page-item disabled">
+					<a class="page-link" href="#">
+						<span class="flaticon-right-arrow"></span>
+					</a>
+				</li>
+				{% endif %}
+
+			</ul>
+		</div>
+	</div>
+
+</div>
+
+					<!-- PAGINATION -->
+					<ul class="page_navigation mt20">
+						{% if page_obj.has_previous %}
+							<li><a href="?page={{ page_obj.previous_page_number }}">Prev</a></li>
+						{% endif %}
+
+						{% for num in page_obj.paginator.page_range %}
+							<li {% if page_obj.number == num %}class="active"{% endif %}>
+								<a href="?page={{ num }}">{{ num }}</a>
+							</li>
+						{% endfor %}
+
+						{% if page_obj.has_next %}
+							<li><a href="?page={{ page_obj.next_page_number }}">Next</a></li>
+						{% endif %}
+					</ul>
+
+				</div>
+
+			</div>
+
+		</div>
+	</section>
+</div>
+
+
+{% endblock %}

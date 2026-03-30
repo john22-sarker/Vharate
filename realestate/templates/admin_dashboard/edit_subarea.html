@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Edit Sub-Area</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success">Update Sub-Area</button>
+    <a href="{% url 'admin_dashboard:manage_subareas' %}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

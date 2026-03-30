@@ -1,0 +1,463 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+
+
+<!-- Home Design -->
+<section class="home-one home1-overlay home1_bgi1" style="margin-top: 10px;">
+  <div class="container">
+    <div class="row posr">
+      <div class="col-lg-12">
+        <div class="home_content">
+          <div class="home-text text-center">
+            <h2 class="fz55">Find Your Dream Home</h2>
+            <p class="fz18 color-white">From as low as $10 per day with limited time offer discounts.</p>
+          </div>
+<form method="get" id="filterForm"
+      action="{% url 'properties:property_list' %}"
+      style="margin: 150px 0 0; background: white; padding: 15px; border-radius: 5px;">
+
+  <div class="home1-advnc-search">
+    <ul class="h1ads_1st_list mb0">
+
+      <!-- Keyword -->
+      <li class="list-inline-item">
+        <div class="form-group">
+          <input type="text" name="q" value="{{ query }}" class="form-control" placeholder="Enter keyword...">
+        </div>
+      </li>
+
+      <!-- Property Type -->
+      <li class="list-inline-item">
+        <div class="search_option_two">
+          <div class="candidate_revew_select">
+            <select name="property_type" class="selectpicker w100 show-tick">
+              <option value="">Property Type</option>
+              <option value="Apartment" {% if filters.property_type == "Apartment" %}selected{% endif %}>Apartment</option>
+              <option value="Family House" {% if filters.property_type == "Family House" %}selected{% endif %}>Family House</option>
+              <option value="Bachelor House" {% if filters.property_type == "Bachelor House" %}selected{% endif %}>Bachelor House</option>
+            </select>
+          </div>
+        </div>
+      </li>
+
+      <!-- City -->
+      <li class="list-inline-item">
+        <div class="search_option_two">
+          <div class="candidate_revew_select">
+            <select name="city" id="city" class="selectpicker w100 show-tick">
+              <option value="">City</option>
+              {% for city in cities %}
+                <option value="{{ city.id }}"
+                  {% if filters.city == city.id|stringformat:"s" %}selected{% endif %}>
+                  {{ city.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </li>
+
+      <!-- Area -->
+      <li class="list-inline-item">
+        <div class="search_option_two">
+          <div class="candidate_revew_select">
+            <select name="area" id="area" class="selectpicker w100 show-tick">
+              <option value="">Area</option>
+              {% for area in areas %}
+                <option value="{{ area.id }}"
+                  {% if filters.area == area.id|stringformat:"s" %}selected{% endif %}>
+                  {{ area.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </li>
+
+      <!-- SubArea -->
+      <li class="list-inline-item">
+        <div class="search_option_two">
+          <div class="candidate_revew_select">
+            <select name="subarea" id="subarea" class="selectpicker w100 show-tick">
+              <option value="">SubArea</option>
+              {% for sub in subareas %}
+                <option value="{{ sub.id }}"
+                  {% if filters.subarea == sub.id|stringformat:"s" %}selected{% endif %}>
+                  {{ sub.name }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </li>
+
+      <!-- Min Price -->
+      <li class="list-inline-item">
+        <div class="form-group">
+          <input type="number" name="price_min" value="{{ filters.price_min }}"
+                 class="form-control" placeholder="Min Price">
+        </div>
+      </li>
+
+      <!-- Max Price -->
+      <li class="list-inline-item">
+        <div class="form-group">
+          <input type="number" name="price_max" value="{{ filters.price_max }}"
+                 class="form-control" placeholder="Max Price">
+        </div>
+      </li>
+
+      <!-- Bathrooms -->
+      <li class="list-inline-item">
+        <div class="search_option_two">
+          <div class="candidate_revew_select">
+            <select name="bathrooms" class="selectpicker w100 show-tick">
+              <option value="">Bathrooms</option>
+              {% for i in "123456"|make_list %}
+                <option value="{{ i }}"
+                  {% if filters.bathrooms == i %}selected{% endif %}>
+                  {{ i }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </li>
+
+      <!-- Bedrooms -->
+      <li class="list-inline-item">
+        <div class="search_option_two">
+          <div class="candidate_revew_select">
+            <select name="bedrooms" class="selectpicker w100 show-tick">
+              <option value="">Bedrooms</option>
+              {% for i in "123456"|make_list %}
+                <option value="{{ i }}"
+                  {% if filters.bedrooms == i %}selected{% endif %}>
+                  {{ i }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </li>
+
+      <!-- Search Button -->
+      <li class="list-inline-item">
+        <div class="search_option_button">
+          <button type="submit" class="btn btn-thm">Search</button>
+        </div>
+      </li>
+
+    </ul>
+  </div>
+</form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- Feature Properties -->
+<section id="feature-property" class="feature-property bgc-f7">
+  
+  <!-- Top Scroll Part (UNCHANGED) -->
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <a href="#feature-property">
+          <div class="mouse_scroll">
+            <div class="icon">
+              <h4>Scroll Down</h4>
+              <p>to discover more</p>
+            </div>
+            <div class="thumb">
+              <img src="{% static 'images/resource/mouse.png' %}" alt="mouse.png">
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container ovh">
+    <div class="row">
+
+      <!-- ✅ HEADING (YOU SAID DON'T MISS — INCLUDED) -->
+      <div class="col-lg-6 offset-lg-3">
+        <div class="main-title text-center mb40">
+          <h2>Featured Properties</h2>
+          <p>Handpicked properties by our team.</p>
+        </div>
+      </div>
+
+      <!-- Slider -->
+      <div class="col-lg-12">
+        <div class="feature_property_slider">
+
+          {% for property in properties %}
+          <div class="item">
+            <a href="{% url 'properties:property_detail' property.slug %}">
+              <div class="feat_property">
+
+                <!-- Image -->
+                <div class="thumb">
+                  <img class="img-whp" src="{{ property.main_image.url }}" alt="{{ property.title }}">
+                  
+                  <div class="thmb_cntnt">
+
+                    <!-- Tags -->
+                    <ul class="tag mb0">
+                      <li class="list-inline-item">
+                        <span>
+                          {% if property.listing_type == 'rent' %}
+                            For Rent
+                          {% else %}
+                            For Sale
+                          {% endif %}
+                        </span>
+                      </li>
+
+                      {% if property.is_featured %}
+                      <li class="list-inline-item"><span>Featured</span></li>
+                      {% endif %}
+                    </ul>
+
+                    <!-- Icons (UNCHANGED) -->
+                    <ul class="icon mb0">
+                      <li class="list-inline-item">
+                        <span class="flaticon-transfer-1 text-white"></span>
+                      </li>
+                      <li class="list-inline-item">
+                        <span class="flaticon-heart text-white"></span>
+                      </li>
+                    </ul>
+
+                    <!-- Price -->
+                    <span class="fp_price">
+                      {{ property.price }} BDT
+                      {% if property.listing_type == 'rent' %}
+                      <small>/mo</small>
+                      {% endif %}
+                    </span>
+
+                  </div>
+                </div>
+
+                <!-- Details -->
+                <div class="details">
+                  <div class="tc_content">
+
+                    <p class="text-thm">{{ property.property_type }}</p>
+
+                    <h4>{{ property.title }}</h4>
+
+                    <p>
+                      <span class="flaticon-placeholder"></span>
+                      {{ property.city.name }} / {{ property.area.name }}
+                    </p>
+
+                    <ul class="prop_details mb0">
+                      <li class="list-inline-item">
+                        <span>Beds: {{ property.rooms }}</span>
+                      </li>
+                      <li class="list-inline-item">
+                        <span>Baths: {{ property.bathrooms }}</span>
+                      </li>
+                      {% if property.size_sqft %}
+                      <li class="list-inline-item">
+                        <span>Sq Ft: {{ property.size_sqft }}</span>
+                      </li>
+                      {% endif %}
+                    </ul>
+
+                  </div>
+
+                  <!-- Footer -->
+<div class="fp_footer">
+  <ul class="fp_meta float-left mb0">
+    <li class="list-inline-item">
+      <span>
+        {% if property.owner.profile.photo %}
+          <img src="{{ property.owner.profile.photo.url }}" alt="" style="height: 50px; width: 50px; border-radius: 50%;">
+        {% else %}
+          <img src="{% static 'images/property/pposter1.png' %}" alt="" style="height: 50px; width: 50px; border-radius: 50%;">
+        {% endif %}
+      </span>
+    </li>
+
+    <li class="list-inline-item">
+      <span>
+        {{ property.owner.profile.full_name|default:property.owner.username }}
+      </span>
+    </li>
+
+    <!-- 🔥 PHONE ADD (optional but dynamic) -->
+    <li class="list-inline-item">
+      <span>
+        {% if property.contact_phone %}
+          {{ property.contact_phone }}
+        {% elif property.owner.profile.phone_number %}
+          {{ property.owner.profile.phone_number }}
+        {% endif %}
+      </span>
+    </li>
+
+  </ul>
+
+  <div class="fp_pdate float-right">
+    {{ property.created_at|timesince }} ago
+  </div>
+</div>
+
+                </div>
+
+              </div>
+            </a>
+          </div>
+          {% endfor %}
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- Property Cities -->
+<section id="property-city" class="property-city pb30">
+  <div class="container">
+
+    <!-- Heading -->
+    <div class="row">
+      <div class="col-lg-6 offset-lg-3">
+        <div class="main-title text-center">
+          <h2>Find Properties in These Cities</h2>
+          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cities Grid -->
+    <div class="row">
+
+      {% for city in top_cities|slice:":4" %}
+
+        {% if forloop.counter == 1 %}
+          <div class="col-lg-4 col-xl-4">
+        {% elif forloop.counter == 2 %}
+          <div class="col-lg-8 col-xl-8">
+        {% elif forloop.counter == 3 %}
+          <div class="col-lg-8 col-xl-8">
+        {% elif forloop.counter == 4 %}
+          <div class="col-lg-4 col-xl-4">
+        {% endif %}
+
+            <a href="{% url 'properties:property_list' %}?city={{ city.id }}">
+              <div class="properti_city" style="position:relative; overflow:hidden; border-radius:10px;">
+
+                <!-- Image -->
+                <div class="thumb" style="{% if forloop.counter == 2 or forloop.counter == 3 %}height:320px;{% else %}height:260px;{% endif %} overflow:hidden;">
+                  
+                  {% if city.image %}
+                    <img src="{{ city.image.url }}" alt="{{ city.name }}"
+                         style="width:100%; height:100%; object-fit:cover;">
+                  {% else %}
+                    <img src="{% static 'images/cities/' %}{{ city.name|lower }}.jpg"
+                         alt="{{ city.name }}"
+                         style="width:100%; height:100%; object-fit:cover;">
+                  {% endif %}
+
+                </div>
+
+                <!-- Overlay -->
+                <div class="overlay" style="
+                    position:absolute;
+                    top:0;
+                    left:0;
+                    width:100%;
+                    height:100%;
+                    background:rgba(0,0,0,0.3);
+                    display:flex;
+                    align-items:flex-end;
+                    padding:15px;
+                ">
+                  <div class="details" style="color:#fff;">
+                    <h4 style="margin:0;">{{ city.name }}</h4>
+                    <p style="margin:0;">
+                      {{ city.property_count }}
+                      {% if city.property_count == 1 %}Property{% else %}Properties{% endif %}
+                    </p>
+                  </div>
+                </div>
+
+              </div>
+            </a>
+
+          </div>
+
+      {% endfor %}
+
+    </div>
+
+  </div>
+</section>
+
+
+	<!-- Why Chose Us -->
+	<section id="why-chose" class="whychose_us bgc-f7 pb30">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-6 offset-lg-3">
+					<div class="main-title text-center">
+						<h2>Why Choose Us</h2>
+						<p>We provide full service at every step.</p>
+					</div>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-6 col-lg-4 col-xl-4">
+					<div class="why_chose_us">
+						<div class="icon">
+							<span class="flaticon-high-five"></span>
+						</div>
+						<div class="details">
+							<h4>Trusted By Thousands</h4>
+							<p>Aliquam dictum elit vitae mauris facilisis at dictum urna dignissim donec vel lectus vel felis.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6 col-lg-4 col-xl-4">
+					<div class="why_chose_us">
+						<div class="icon">
+							<span class="flaticon-home-1"></span>
+						</div>
+						<div class="details">
+							<h4>Wide Renge Of Properties</h4>
+							<p>Aliquam dictum elit vitae mauris facilisis at dictum urna dignissim donec vel lectus vel felis.</p>
+						</div>
+					</div>
+				</div>
+				<div class="col-md-6 col-lg-4 col-xl-4">
+					<div class="why_chose_us">
+						<div class="icon">
+							<span class="flaticon-profit"></span>
+						</div>
+						<div class="details">
+							<h4>Financing Made Easy</h4>
+							<p>Aliquam dictum elit vitae mauris facilisis at dictum urna dignissim donec vel lectus vel felis.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+
+
+{% endblock %}

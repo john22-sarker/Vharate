@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load socialaccount %}
+
+{% block content %}
+
+<!-- Our LogIn Register -->
+
+<section class="our-log-reg bgc-fa">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-12 col-lg-6 offset-lg-3">
+                <div class="sign_up_form inner_page">
+
+```
+                <div class="heading">
+                    <h3 class="text-center">Register to start learning</h3>
+                    <p class="text-center">
+                        Have an account? 
+                        <a class="text-thm" href="{% url 'accounts:login' %}">Login</a>
+                    </p>
+                </div>
+
+                <div class="details">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <style>
+                            input {
+                                height: 40px;
+                                width: 100%;
+                            }
+                            label { 
+                                margin-bottom: 0;
+                            }
+                        </style>
+
+                        <!-- USERNAME -->
+                        <label>Username</label>
+                        <div class="form-group">
+                            {{ form.username }}
+                            {% for error in form.username.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- EMAIL -->
+                        <label>Email Address</label>
+                        <div class="form-group">
+                            {{ form.email }}
+                            {% for error in form.email.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- FULL NAME -->
+                        <label>Full Name</label>
+                        <div class="form-group">
+                            {{ form.full_name }}
+                            {% for error in form.full_name.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- PHONE -->
+                        <label>Phone Number</label>
+                        <div class="form-group">
+                            {{ form.phone_number }}
+                            {% for error in form.phone_number.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- PASSWORD -->
+                        <label>Password</label>
+                        <div class="form-group">
+                            {{ form.password1 }}
+                            {% for error in form.password1.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <!-- CONFIRM PASSWORD -->
+                        <label>Confirm Password</label>
+                        <div class="form-group">
+                            {{ form.password2 }}
+                            {% for error in form.password2.errors %}
+                                <div class="text-danger">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <button type="submit" class="btn btn-log btn-block btn-thm2">
+                            Register
+                        </button>
+
+                        <div class="divide">
+                            <span class="lf_divider">Or</span>
+                            <hr>
+                        </div>
+
+                        <div class="row mt40">
+                            <div class="col-lg">
+                                <button type="button" class="btn btn-block color-white bgc-fb mb0">
+                                    <i class="fa fa-facebook float-left mt5"></i> Facebook
+                                </button>
+                            </div>
+
+                            <div class="col-lg">
+                                <!-- GOOGLE LOGIN -->
+                                <a href="{% provider_login_url 'google' %}" 
+                                   class="btn btn2 btn-block color-white bgc-gogle mb0">
+                                    <i class="fa fa-google float-left mt5"></i> Google
+                                </a>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+```
+
+</section>
+
+{% endblock %}

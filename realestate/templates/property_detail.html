@@ -1,0 +1,373 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="single_page_listing_style">
+    <div class="container-fluid p0">
+        <div class="row">
+            <div class="col-sm-6 col-lg-6 p0">
+                <div class="row m0">
+                    <div class="col-lg-12 p0">
+                        <div class="spls_style_one pr1 1px">
+                            <img class="img-fluid w100" src="{{ property.main_image.url }}" alt="{{ property.title }}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-6 col-lg-6 p0">
+                <div class="row m0">
+
+                    {% if property.image_2 %}
+                    <div class="col-sm-6 col-lg-6 p0">
+                        <div class="spls_style_one">
+                            <a class="popup-img" href="{{ property.image_2.url }}">
+                                <img class="img-fluid w100" src="{{ property.image_2.url }}">
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if property.image_3 %}
+                    <div class="col-sm-6 col-lg-6 p0">
+                        <div class="spls_style_one">
+                            <a class="popup-img" href="{{ property.image_3.url }}">
+                                <img class="img-fluid w100" src="{{ property.image_3.url }}">
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if property.image_4 %}
+                    <div class="col-sm-6 col-lg-6 p0">
+                        <div class="spls_style_one">
+                            <a class="popup-img" href="{{ property.image_4.url }}">
+                                <img class="img-fluid w100" src="{{ property.image_4.url }}">
+                            </a>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="p0">
+    <div class="container">
+        <div class="row listing_single_row">
+            <div class="col-sm-6 col-lg-7 col-xl-8">
+                <div class="single_property_title">
+                    <a href="{{ property.main_image.url }}" class="upload_btn popup-img">
+                        <span class="flaticon-photo-camera"></span> View Photos
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="our-agent-single bgc-f7 pb30-991">
+    <div class="container">
+        <div class="row">
+
+            <!-- LEFT CONTENT -->
+            <div class="col-md-12 col-lg-8 mt50">
+                <div class="row">
+
+                    <!-- TITLE -->
+                    <div class="col-lg-12">
+                        <div class="listing_single_description2 mt30-767 mb30-767">
+                            <div class="single_property_title">
+                                <h2>{{ property.title }}</h2>
+                                <p>{{ property.address }}</p>
+                            </div>
+                            <div class="single_property_social_share style2">
+                                <div class="price">
+                                    <h2>{{ property.price }} <small>BDT</small></h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- BASIC INFO -->
+                    <div class="col-lg-12">
+                        <div class="listing_single_description style2">
+                            <div class="lsd_list">
+                                <ul class="mb0">
+                                    <li class="list-inline-item"><a href="#">{{ property.property_type }}</a></li>
+                                    <li class="list-inline-item"><a href="#">Beds: {{ property.rooms }}</a></li>
+                                    <li class="list-inline-item"><a href="#">Baths: {{ property.bathrooms }}</a></li>
+                                    {% if property.size_sqft %}
+                                    <li class="list-inline-item"><a href="#">Sq Ft: {{ property.size_sqft }}</a></li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+
+                            <h4 class="mb30">Description</h4>
+                            <p>{{ property.description }}</p>
+                        </div>
+                    </div>
+
+                    <!-- FACILITIES -->
+                    <div class="col-lg-12">
+                        <div class="additional_details">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <h4 class="mb15">Property Details</h4>
+                                </div>
+
+                                <!-- COLUMN 1 -->
+                                <div class="col-md-6 col-lg-6 col-xl-4">
+                                    <ul class="list-inline-item">
+                                        <li><p>Property ID :</p></li>
+                                        <li><p>Price :</p></li>
+                                        <li><p>Property Size :</p></li>
+                                        <li><p>Year Built :</p></li>
+                                    </ul>
+                                    <ul class="list-inline-item">
+                                        <li><p><span>{{ property.id }}</span></p></li>
+                                        <li><p><span>{{ property.price }} BDT</span></p></li>
+                                        <li><p><span>{{ property.size_sqft|default:"N/A" }} Sq Ft</span></p></li>
+                                        <li><p><span>{{ property.year_built|default:"N/A" }}</span></p></li>
+                                    </ul>
+                                </div>
+
+                                <!-- COLUMN 2 -->
+                                <div class="col-md-6 col-lg-6 col-xl-4">
+                                    <ul class="list-inline-item">
+                                        <li><p>Bedrooms :</p></li>
+                                        <li><p>Bathrooms :</p></li>
+                                        <li><p>Garage :</p></li>
+                                        <li><p>Garage Size :</p></li>
+                                    </ul>
+                                    <ul class="list-inline-item">
+                                        <li><p><span>{{ property.rooms }}</span></p></li>
+                                        <li><p><span>{{ property.bathrooms }}</span></p></li>
+                                        <li><p><span>{% if property.garage_available %}Yes{% else %}No{% endif %}</span></p></li>
+                                        <li><p><span>{{ property.garage_size|default:"N/A" }}</span></p></li>
+                                    </ul>
+                                </div>
+
+                                <!-- COLUMN 3 -->
+                                <div class="col-md-6 col-lg-6 col-xl-4">
+                                    <ul class="list-inline-item">
+                                        <li><p>Property Type :</p></li>
+                                        <li><p>Property Status :</p></li>
+                                    </ul>
+                                    <ul class="list-inline-item">
+                                        <li><p><span>{{ property.property_type }}</span></p></li>
+                                        <li><p><span>{{ property.status|default:"Available" }}</span></p></li>
+                                    </ul>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- FACILITIES -->
+                     <div class="col-lg-12">
+                        <div class="application_statics mt30">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <h4 class="mb10">Features</h4>
+                                </div>
+
+                                <!-- COLUMN 1 -->
+                                <div class="col-sm-6 col-md-6 col-lg-4">
+                                    <ul class="order_list list-inline-item">
+                                        {% if property.air_conditioning %}
+                                        <li><a href="#"><span class="flaticon-tick"></span>Air Conditioning</a></li>
+                                        {% endif %}
+
+                                        {% if property.barbeque %}
+                                        <li><a href="#"><span class="flaticon-tick"></span>Barbeque</a></li>
+                                        {% endif %}
+
+                                        {% if property.dryer %}
+                                        <li><a href="#"><span class="flaticon-tick"></span>Dryer</a></li>
+                                        {% endif %}
+
+                                        {% if property.gym %}
+                                        <li><a href="#"><span class="flaticon-tick"></span>Gym</a></li>
+                                        {% endif %}
+
+                                        {% if property.laundry %}
+                                        <li><a href="#"><span class="flaticon-tick"></span>Laundry</a></li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+
+                                <!-- COLUMN 2 -->
+                                <div class="col-sm-6 col-md-6 col-lg-4">
+                                    <ul class="order_list list-inline-item">
+                                        {% if property.lawn %}
+                                        <li><a href="#"><span class="flaticon-tick"></span>Lawn</a></li>
+                                        {% endif %}
+
+                                        {% if property.microwave %}
+                                        <li><a href="#"><span class="flaticon-tick"></span>Microwave</a></li>
+                                        {% endif %}
+
+                                        {% if property.outdoor_shower %}
+                                        <li><a href="#"><span class="flaticon-tick"></span>Outdoor Shower</a></li>
+                                        {% endif %}
+
+                                        {% if property.refrigerator %}
+                                        <li><a href="#"><span class="flaticon-tick"></span>Refrigerator</a></li>
+                                        {% endif %}
+
+                                        {% if property.sauna %}
+                                        <li><a href="#"><span class="flaticon-tick"></span>Sauna</a></li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+
+                                <!-- COLUMN 3 -->
+                                <div class="col-sm-6 col-md-6 col-lg-4">
+                                    <ul class="order_list list-inline-item">
+                                        {% if property.swimming_pool %}
+                                        <li><a href="#"><span class="flaticon-tick"></span>Swimming Pool</a></li>
+                                        {% endif %}
+
+                                        {% if property.tv_cable %}
+                                        <li><a href="#"><span class="flaticon-tick"></span>TV Cable</a></li>
+                                        {% endif %}
+
+                                        {% if property.washer %}
+                                        <li><a href="#"><span class="flaticon-tick"></span>Washer</a></li>
+                                        {% endif %}
+
+                                        {% if property.wifi_available %}
+                                        <li><a href="#"><span class="flaticon-tick"></span>WiFi</a></li>
+                                        {% endif %}
+
+                                        {% if property.window_coverings %}
+                                        <li><a href="#"><span class="flaticon-tick"></span>Window Coverings</a></li>
+                                        {% endif %}
+                                    </ul>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- FACILITIES -->
+                    <div class="col-lg-12">
+                        <div class="product_single_content">
+                            <div class="mbp_pagination_comments mt30">
+                                <div class="mbp_comment_form style2">
+                                    <h4>Write a Review</h4>
+                                    <ul class="sspd_review">
+                                        <li class="list-inline-item">
+                                            <ul class="mb0">
+                                                <li class="list-inline-item"><a href="#"><i class="fa fa-star"></i></a></li>
+                                                <li class="list-inline-item"><a href="#"><i class="fa fa-star"></i></a></li>
+                                                <li class="list-inline-item"><a href="#"><i class="fa fa-star"></i></a></li>
+                                                <li class="list-inline-item"><a href="#"><i class="fa fa-star"></i></a></li>
+                                                <li class="list-inline-item"><a href="#"><i class="fa fa-star"></i></a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="list-inline-item review_rating_para">Your Rating & Review</li>
+                                    </ul>
+                                    <form class="comments_form">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control" id="exampleInputName1" aria-describedby="textHelp" placeholder="Review Title">
+                                        </div>
+                                        <div class="form-group">
+                                            <textarea class="form-control" id="exampleFormControlTextarea1" rows="12" placeholder="Your Review"></textarea>
+                                        </div>
+                                        <button type="submit" class="btn btn-thm">Submit Review <span class="flaticon-right-arrow-1"></span></button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- RIGHT SIDEBAR -->
+            <div class="col-lg-4 col-xl-4 mt50">
+                <div class="sidebar_listing_list">
+                    <div class="sidebar_advanced_search_widget">
+
+                        <!-- 🔥 DYNAMIC USER -->
+                        <div class="sl_creator">
+                            <h4 class="mb25">Listed By</h4>
+                            <div class="media">
+
+                                <!-- PROFILE IMAGE -->
+                                {% if property.owner.profile.photo %}
+    <img class="mr-3" src="{{ property.owner.profile.photo.url }}" style="    height: 45px;
+    width: 45px;
+    border-radius: 50%;">
+{% else %}
+    <img class="mr-3" src="{% static 'images/team/lc1.png' %}" style="    height: 45px;
+    width: 45px;
+    border-radius: 50%;">
+{% endif %}
+
+                                <div class="media-body">
+
+                                    <!-- NAME -->
+                                    <h5 class="mt-0 mb0">
+    {{ property.owner.profile.full_name|default:property.owner.username }}
+</h5>
+
+                                    <!-- PHONE -->
+                                    {% if property.contact_phone %}
+                                        <p class="mb0">{{ property.contact_phone }}</p>
+                                    {% elif property.owner.userprofile.phone %}
+                                        <p class="mb0">{{ property.owner.userprofile.phone }}</p>
+                                    {% endif %}
+
+                                    <!-- EMAIL -->
+                                    {% if property.contact_email %}
+                                        <p class="mb0">{{ property.contact_email }}</p>
+                                    {% else %}
+                                        <p class="mb0">{{ property.owner.email }}</p>
+                                    {% endif %}
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CONTACT FORM -->
+                        <ul class="sasw_list mb0">
+                            <li class="search_area">
+                                <input type="text" class="form-control" placeholder="Your Name">
+                            </li>
+                            <li class="search_area">
+                                <input type="number" class="form-control" placeholder="Phone">
+                            </li>
+                            <li class="search_area">
+                                <input type="email" class="form-control" placeholder="Email">
+                            </li>
+                            <li class="search_area">
+                                <textarea class="form-control" rows="5" placeholder="I'm interested"></textarea>
+                            </li>
+                            <li>
+                                <button class="btn btn-block btn-thm">Send</button>
+                            </li>
+                        </ul>
+
+                    </div>
+                </div>
+
+                <!-- OWNER ACTION -->
+                {% if user.is_authenticated and user == property.owner %}
+                <div class="mt-3">
+                    <a href="{% url 'properties:edit_property' property.slug %}" class="btn btn-warning">Edit</a>
+                    <a href="{% url 'properties:delete_property' property.slug %}" class="btn btn-danger">Delete</a>
+                </div>
+                {% endif %}
+
+            </div>
+
+
+        </div>
+    </div>
+</section>
+
+{% endblock %}

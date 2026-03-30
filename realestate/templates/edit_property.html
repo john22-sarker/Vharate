@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="bg-light p-4 rounded mb-5">
+    <div class="container">
+        <h2 class="mb-4">Edit Property: {{ property.title }}</h2>
+        <form method="post" enctype="multipart/form-data" class="row g-3">
+            {% csrf_token %}
+
+            <!-- Title -->
+            <div class="col-md-6">
+                <label class="form-label">Property Title</label>
+                {{ form.title }}
+                {% for error in form.title.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <!-- Property Type -->
+            <div class="col-md-6">
+                <label class="form-label">Property Type</label>
+                {{ form.property_type }}
+                {% for error in form.property_type.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <!-- Price -->
+            <div class="col-md-6">
+                <label class="form-label">Price (BDT)</label>
+                {{ form.price }}
+                {% for error in form.price.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <!-- Location: City / Area / SubArea -->
+            <div class="col-md-4">
+                <label class="form-label">City</label>
+                <select id="city_select" class="form-select" name="city">
+                    <option value="">Select City</option>
+                    {% for city in cities %}
+                        <option value="{{ city.id }}" {% if selected_city == city.id %}selected{% endif %}>{{ city.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Area</label>
+                <select id="area_select" class="form-select" name="area">
+                    <option value="">Select Area</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Sub-Area</label>
+                <select id="subarea_select" class="form-select" name="subarea">
+                    <option value="">Select Sub-Area</option>
+                </select>
+            </div>
+
+            <!-- Description -->
+            <div class="col-12">
+                <label class="form-label">Description</label>
+                {{ form.description }}
+                {% for error in form.description.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <!-- Contact Details -->
+            <div class="col-md-6">
+                <label class="form-label">Contact Name</label>
+                {{ form.contact_name }}
+                {% for error in form.contact_name.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                {% endfor %}
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Contact Phone</label>
+                {{ form.contact_phone }}
+                {% for error in form.contact_phone.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                {% endfor %}
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Email (Optional)</label>
+                {{ form.contact_email }}
+                {% for error in form.contact_email.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                {% endfor %}
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">WhatsApp Number (Optional)</label>
+                {{ form.contact_whatsapp }}
+                {% for error in form.contact_whatsapp.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <!-- Optional Area -->
+            <div class="col-md-6">
+                <label class="form-label">Area (sq.ft) (Optional)</label>
+                {{ form.size_sqft }}
+                {% for error in form.size_sqft.errors %}
+                    <div class="text-danger">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <!-- Images -->
+            <div class="col-md-6">
+                <label class="form-label">Main Image</label>
+                {{ form.main_image }}
+                {% if property.main_image %}
+                    <img src="{{ property.main_image.url }}" alt="Main Image" class="img-thumbnail mt-2" width="150">
+                {% endif %}
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Additional Images</label>
+                {{ form.image_2 }} {{ form.image_3 }} {{ form.image_4 }}
+            </div>
+
+            <!-- Facility Fields -->
+            <div class="col-md-4">
+                <label class="form-label">WiFi Available</label>
+                {{ form.wifi_available }}
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Dog Allowed</label>
+                {{ form.dog_allowed }}
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Smoking Allowed</label>
+                {{ form.smoking_allowed }}
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Garage Available</label>
+                {{ form.garage_available }}
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Music Allowed</label>
+                {{ form.music_allowed }}
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Gate Close Time</label>
+                {{ form.gate_close_time }}
+            </div>
+
+            <!-- Submit -->
+            <div class="col-12 mt-3">
+                <button type="submit" class="btn btn-success">Update Property</button>
+                <a href="{% url 'accounts:user_dashboard' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- JS: Dependent dropdowns -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const citySelect = document.getElementById('city_select');
+    const areaSelect = document.getElementById('area_select');
+    const subareaSelect = document.getElementById('subarea_select');
+
+    const selectedCity = "{{ selected_city }}";
+    const selectedArea = "{{ selected_area }}";
+
+    function fetchAreas(cityId, preselect=null) {
+        areaSelect.innerHTML = '<option value="">Select Area</option>';
+        subareaSelect.innerHTML = '<option value="">Select Sub-Area</option>';
+        if (!cityId) return;
+        fetch(`/locations/areas/${cityId}/`).then(res => res.json()).then(data => {
+            data.forEach(a => {
+                const option = new Option(a.name, a.id);
+                if(preselect && preselect == a.id) option.selected = true;
+                areaSelect.add(option);
+            });
+            if(preselect) fetchSubareas(selectedArea);
+        });
+    }
+
+    function fetchSubareas(areaId, preselect=null) {
+        subareaSelect.innerHTML = '<option value="">Select Sub-Area</option>';
+        if (!areaId) return;
+        fetch(`/locations/subareas/${areaId}/`).then(res => res.json()).then(data => {
+            data.forEach(s => {
+                const option = new Option(s.name, s.id);
+                if(preselect && preselect == s.id) option.selected = true;
+                subareaSelect.add(option);
+            });
+        });
+    }
+
+    if(selectedCity) fetchAreas(selectedCity, selectedArea);
+
+    citySelect.addEventListener('change', function(){ fetchAreas(this.value); });
+    areaSelect.addEventListener('change', function(){ fetchSubareas(this.value); });
+});
+</script>
+{% endblock %}

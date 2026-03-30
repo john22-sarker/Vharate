@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<section class="container mt-4">
+    <h2 class="mb-4">Add New Property</h2>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="row g-3">
+
+            <!-- ===================== -->
+            <!-- BASIC INFO -->
+            <!-- ===================== -->
+            <h5 class="mt-3">Basic Information</h5>
+
+            {% for field in form %}
+                {% if field.name not in "city area subarea contact_name contact_phone contact_email contact_whatsapp size_sqft wifi_available dog_allowed smoking_allowed garage_available music_allowed gate_close_time" %}
+                <div class="col-md-6">
+                    <label class="form-label">{{ field.label }}</label>
+                    {{ field }}
+
+                    {% if field.help_text %}
+                        <small class="text-muted">{{ field.help_text }}</small>
+                    {% endif %}
+
+                    {% for error in field.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            {% endfor %}
+
+            <!-- ===================== -->
+            <!-- SIZE -->
+            <!-- ===================== -->
+            <div class="col-md-6">
+                <label class="form-label">Area (sq.ft) <span class="text-muted">(Optional)</span></label>
+                {{ form.size_sqft }}
+                {% for error in form.size_sqft.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <!-- ===================== -->
+            <!-- LOCATION -->
+            <!-- ===================== -->
+            <h5 class="mt-4">Location</h5>
+
+            <div class="col-md-4">
+                <label class="form-label">City</label>
+                {{ form.city }}
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Area</label>
+                {{ form.area }}
+            </div>
+
+            <div class="col-md-4">
+                <label class="form-label">Sub-Area</label>
+                {{ form.subarea }}
+            </div>
+
+            <!-- ===================== -->
+            <!-- CONTACT -->
+            <!-- ===================== -->
+            <h5 class="mt-4">Contact Details</h5>
+            <small class="text-muted">
+                Auto-filled from your profile. You can change if needed.
+            </small>
+
+            <div class="col-md-6">
+                <label class="form-label">Contact Name</label>
+                {{ form.contact_name }}
+                {% for error in form.contact_name.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Contact Phone</label>
+                {{ form.contact_phone }}
+                {% for error in form.contact_phone.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">Email <span class="text-muted">(Optional)</span></label>
+                {{ form.contact_email }}
+                {% for error in form.contact_email.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <div class="col-md-6">
+                <label class="form-label">WhatsApp Number <span class="text-muted">(Optional)</span></label>
+                {{ form.contact_whatsapp }}
+                {% for error in form.contact_whatsapp.errors %}
+                    <div class="text-danger small">{{ error }}</div>
+                {% endfor %}
+            </div>
+
+            <!-- ===================== -->
+            <!-- FACILITIES -->
+            <!-- ===================== -->
+            <h5 class="mt-4">Facilities</h5>
+
+            <div class="col-md-4">{{ form.wifi_available }} WiFi Available</div>
+            <div class="col-md-4">{{ form.dog_allowed }} Dog Allowed</div>
+            <div class="col-md-4">{{ form.smoking_allowed }} Smoking Allowed</div>
+            <div class="col-md-4">{{ form.garage_available }} Garage Available</div>
+            <div class="col-md-4">{{ form.music_allowed }} Music Allowed</div>
+
+            <div class="col-md-4">
+                <label class="form-label">Gate Close Time</label>
+                {{ form.gate_close_time }}
+            </div>
+
+        </div>
+
+        <!-- SUBMIT -->
+        <button type="submit" class="btn btn-success mt-4 px-4">
+            Submit Property
+        </button>
+    </form>
+</section>
+
+<!-- ===================== -->
+<!-- AJAX DROPDOWN FIX -->
+<!-- ===================== -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    const citySelect = document.getElementById('id_city');
+    const areaSelect = document.getElementById('id_area');
+    const subareaSelect = document.getElementById('id_subarea');
+
+    // CITY → AREA
+    citySelect.addEventListener('change', function() {
+        areaSelect.innerHTML = '<option value="">Select Area</option>';
+        subareaSelect.innerHTML = '<option value="">Select Sub-Area</option>';
+
+        if (!this.value) return;
+
+        fetch(`/ajax/load-areas/?city_id=${this.value}`)
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(area => {
+                    const option = document.createElement('option');
+                    option.value = area.id;
+                    option.text = area.name;
+                    areaSelect.add(option);
+                });
+            });
+    });
+
+    // AREA → SUBAREA
+    areaSelect.addEventListener('change', function() {
+        subareaSelect.innerHTML = '<option value="">Select Sub-Area</option>';
+
+        if (!this.value) return;
+
+        fetch(`/ajax/load-subareas/?area_id=${this.value}`)
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(subarea => {
+                    const option = document.createElement('option');
+                    option.value = subarea.id;
+                    option.text = subarea.name;
+                    subareaSelect.add(option);
+                });
+            });
+    });
+
+});
+</script>
+
+{% endblock %}
