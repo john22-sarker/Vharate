@@ -168,9 +168,43 @@ def forgot_password_view(request):
 # =====================================
 # VERIFY RESET OTP
 # =====================================
+
+def verify_code_view(request):
+    otp = request.session.get('otp')
+    user_id = request.session.get('otp_user')
+
+    print("SIGNUP OTP:", otp)  # 🔥 DEBUG
+
+    if not otp or not user_id:
+        messages.error(request, "Session expired. Please sign up again.")
+        return redirect('accounts:signup')
+
+    if request.method == 'POST':
+        code = request.POST.get('otp')
+
+        if code == str(otp):
+            user = User.objects.get(id=user_id)
+            user.is_active = True
+            user.save()
+
+            request.session.pop('otp', None)
+            request.session.pop('otp_user', None)
+
+            return redirect('accounts:login')
+
+        else:
+            messages.error(request, "Invalid OTP.")
+
+    return render(request, 'accounts/verify_code.html', {
+        'otp': otp   # 🔥 MUST
+    })
+
+
 def verify_reset_otp_view(request):
     otp = request.session.get('reset_otp')
     user_id = request.session.get('reset_user')
+
+    print("RESET OTP:", otp)  # 🔥 DEBUG
 
     if not otp or not user_id:
         messages.error(request, "Session expired.")
@@ -183,9 +217,15 @@ def verify_reset_otp_view(request):
             request.session['otp_verified'] = True
             return redirect('accounts:reset_password')
 
-        messages.error(request, "Invalid OTP.")
+        else:
+            messages.error(request, "Invalid OTP.")
 
-    return render(request, 'accounts/verify_reset_otp.html')
+    return render(request, 'accounts/verify_reset_otp.html', {
+        'otp': otp   # 🔥 MUST
+    })
+
+
+
 
 
 # =====================================
