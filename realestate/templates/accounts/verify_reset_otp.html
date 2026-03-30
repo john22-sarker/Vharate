@@ -44,7 +44,9 @@
                     </button>
 
                 </form>
-
+{% for message in messages %}
+        <p class="text-center text-danger mt-3">{{ message }}</p>
+    {% endfor %}
             </div>
         </div>
     </div>
