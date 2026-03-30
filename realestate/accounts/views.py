@@ -73,7 +73,7 @@ def verify_code_view(request):
         else:
             messages.error(request, "Invalid OTP.")
 
-    return render(request, 'accounts/verify_code.html')
+    return render(request, 'accounts/verify_code.html', {'otp': otp})
 
 
 # =============================
@@ -167,7 +167,7 @@ def verify_reset_otp_view(request):
         else:
             messages.error(request, "Invalid OTP.")
 
-    return render(request, 'accounts/verify_reset_otp.html')
+    return render(request, 'accounts/verify_reset_otp.html', {'otp': otp})
 
 
 # =============================
