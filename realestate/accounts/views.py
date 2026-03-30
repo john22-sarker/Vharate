@@ -20,7 +20,6 @@ def signup_view(request):
         if form.is_valid():
             user = form.save()
 
-            # ❌ login removed for email verification flow
             messages.success(
                 request,
                 "Account created successfully! Please check your email to verify your account."
@@ -48,6 +47,11 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
 
         if user:
+            # 🔥 EMAIL VERIFICATION CHECK
+            if not user.emailaddress_set.filter(verified=True).exists():
+                messages.error(request, "Please verify your email before logging in.")
+                return redirect('account_login')
+
             login(request, user)
             messages.success(request, f"Welcome back, {user.username}!")
             return redirect('properties:home')
@@ -74,20 +78,20 @@ def user_dashboard(request):
 
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
 
-    # ✅ PROFILE FORM (NO FILES HERE)
+    # PROFILE FORM
     profile_form = ProfileUpdateForm(
         request.POST or None,
         instance=profile,
         user=request.user
     )
 
-    # ✅ PASSWORD FORM
+    # PASSWORD FORM
     password_form = PasswordChangeForm(
         user=request.user,
         data=request.POST or None
     )
 
-    # ✅ USER PROPERTIES
+    # USER PROPERTIES
     properties = Property.objects.filter(
         owner=request.user
     ).order_by('-created_at')
