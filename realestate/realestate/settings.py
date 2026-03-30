@@ -105,6 +105,8 @@ ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 
+SOCIALACCOUNT_ADAPTER = 'accounts.adapter.MySocialAccountAdapter'
+
 # ===============================
 # GOOGLE CONFIG (🔥 MUST)
 # ===============================
