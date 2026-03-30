@@ -20,12 +20,13 @@ def signup_view(request):
         if form.is_valid():
             user = form.save()
 
-            # ✅ FIX: specify backend
-            user.backend = 'django.contrib.auth.backends.ModelBackend'
+            # ❌ login removed for email verification flow
+            messages.success(
+                request,
+                "Account created successfully! Please check your email to verify your account."
+            )
 
-            login(request, user)
-            messages.success(request, "Account created successfully!")
-            return redirect('properties:home')
+            return redirect('account_email_verification_sent')
         else:
             messages.error(request, "Please fix the errors below.")
 
