@@ -41,6 +41,7 @@ def verify_code_view(request):
     otp = request.session.get('otp')
     user_id = request.session.get('otp_user')
 
+    # session check
     if not otp or not user_id:
         messages.error(request, "Session expired. Please sign up again.")
         return redirect('accounts:signup')
@@ -48,12 +49,17 @@ def verify_code_view(request):
     if request.method == 'POST':
         code = request.POST.get('otp')
 
+        if not code:
+            messages.error(request, "Please enter OTP.")
+            return redirect('accounts:verify_code')
+
         if code == str(otp):
             try:
                 user = User.objects.get(id=user_id)
                 user.is_active = True
                 user.save()
 
+                # cleanup session
                 request.session.pop('otp', None)
                 request.session.pop('otp_user', None)
 
@@ -65,7 +71,41 @@ def verify_code_view(request):
         else:
             messages.error(request, "Invalid OTP.")
 
-    return render(request, 'accounts/verify_code.html')
+    return render(request, 'accounts/verify_code.html', {
+    })
+
+
+
+
+
+
+def verify_reset_otp_view(request):
+    otp = request.session.get('reset_otp')
+    user_id = request.session.get('reset_user')
+
+    # session check
+    if not otp or not user_id:
+        messages.error(request, "Session expired. Try again.")
+        return redirect('accounts:forgot_password')
+
+    if request.method == 'POST':
+        code = request.POST.get('otp')
+
+        if not code:
+            messages.error(request, "Please enter OTP.")
+            return redirect('accounts:verify_reset_otp')
+
+        if code == str(otp):
+            request.session['otp_verified'] = True
+
+            messages.success(request, "OTP verified successfully!")
+            return redirect('accounts:reset_password')
+
+        else:
+            messages.error(request, "Invalid OTP.")
+
+    return render(request, 'accounts/verify_reset_otp.html', {
+    })
 
 
 # =====================================
