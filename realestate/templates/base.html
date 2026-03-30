@@ -1,5 +1,4 @@
 {% load static %}
-{% load i18n %}
 <!DOCTYPE html>
 <html dir="ltr" lang="en">
 
@@ -58,18 +57,7 @@
       <ul id="respMenu" class="ace-responsive-menu text-right" data-menu-style="horizontal">
         
         <!-- Home -->
-<li>
-<form action="{% url 'set_language' %}" method="post">
-    {% csrf_token %}
-    
-    <input type="hidden" name="next" value="{{ request.path }}">
-    
-    <select name="language" onchange="this.form.submit()">
-        <option value="en" {% if LANGUAGE_CODE == 'en' %}selected{% endif %}>English</option>
-        <option value="bn" {% if LANGUAGE_CODE == 'bn' %}selected{% endif %}>বাংলা</option>
-    </select>
-</form>
-</li>
+
 		<li>
           <a href="{% url 'properties:home' %}">
             <span class="title">Home</span>
@@ -221,18 +209,6 @@
   <!-- Mobile Menu -->
   <nav id="menu" class="stylehome1">
     <ul>
-	<li><li>
-<form action="{% url 'set_language' %}" method="post">
-    {% csrf_token %}
-    
-    <input type="hidden" name="next" value="{{ request.path }}">
-    
-    <select name="language" onchange="this.form.submit()">
-        <option value="en" {% if LANGUAGE_CODE == 'en' %}selected{% endif %}>English</option>
-        <option value="bn" {% if LANGUAGE_CODE == 'bn' %}selected{% endif %}>বাংলা</option>
-    </select>
-</form>
-</li></li>
       <li>
         <a href="{% url 'properties:home' %}">Home</a>
       </li>
