@@ -12,7 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ===============================
 SECRET_KEY = 'django-insecure-change-this-key'
 
-DEBUG = True   # ⚠️ Live হলে False করবে
+DEBUG = True  # ⚠️ Production হলে False
 
 ALLOWED_HOSTS = ['varate.pythonanywhere.com']
 
@@ -29,17 +29,16 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Required for allauth
+    # Sites (required)
     'django.contrib.sites',
 
-    # Allauth
+    # Allauth core
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
 
-    # Providers (optional but kept)
+    # Providers
     'allauth.socialaccount.providers.google',
-    'allauth.socialaccount.providers.facebook',
 
     # Your apps
     'accounts',
@@ -63,7 +62,7 @@ MIDDLEWARE = [
 
     'django.contrib.auth.middleware.AuthenticationMiddleware',
 
-    # Allauth middleware
+    # Allauth middleware (important)
     'allauth.account.middleware.AccountMiddleware',
 
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -72,19 +71,54 @@ MIDDLEWARE = [
 
 
 # ===============================
-# AUTH SYSTEM
+# AUTH BACKENDS
 # ===============================
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
+
+# ===============================
+# ALLAUTH SETTINGS (🔥 IMPORTANT)
+# ===============================
+
+# Login redirect
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-# ✅ Updated Allauth config (no warning)
+# Email ভিত্তিক login
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
+
+# 🔥 Disable signup form (Google direct login)
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_LOGIN_ON_GET = True
+
+# 🔥 No extra पूछताछ
+ACCOUNT_EMAIL_REQUIRED = False
+ACCOUNT_USERNAME_REQUIRED = False
+SOCIALACCOUNT_EMAIL_REQUIRED = False
+
+# 🔥 Optional (better UX)
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+
+
+# ===============================
+# GOOGLE CONFIG (🔥 MUST)
+# ===============================
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'APP': {
+            'client_id': '958422215051-lul6cnnob1it55ctss0fb5h29i5l6eq9.apps.googleusercontent.com',
+            'secret': 'YOUR_GOOGLE_SECRET',
+            'key': ''
+        },
+        'SCOPE': ['profile', 'email'],
+        'AUTH_PARAMS': {'access_type': 'online'},
+    }
+}
 
 
 # ===============================
@@ -99,15 +133,11 @@ ROOT_URLCONF = 'realestate.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-
-        # 🔥 Important (your custom templates)
-        'DIRS': [BASE_DIR / 'templates'],
-
+        'DIRS': [BASE_DIR / 'templates'],  # custom templates
         'APP_DIRS': True,
-
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.request',
+                'django.template.context_processors.request',  # required
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
@@ -159,17 +189,15 @@ USE_TZ = True
 # ===============================
 STATIC_URL = '/static/'
 
-# 🔥 Your local static folder
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
-# 🔥 PythonAnywhere use করবে এইটা
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
 # ===============================
-# MEDIA FILES (Images, Uploads)
+# MEDIA FILES
 # ===============================
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -182,9 +210,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # ===============================
-# EXTRA SETTINGS
+# EXTRA LIMITS
 # ===============================
-SOCIALACCOUNT_LOGIN_ON_GET = True
-SOCIALACCOUNT_AUTO_SIGNUP = True
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760
