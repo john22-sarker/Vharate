@@ -18,7 +18,7 @@ from properties.models import Property
 # =============================
 
 def signup_view(request):
-form = SignUpForm(request.POST or None)
+    form = SignUpForm(request.POST or None)
 
 ```
 if request.method == 'POST' and form.is_valid():
