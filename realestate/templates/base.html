@@ -1,5 +1,5 @@
 {% load static %}
-
+{% load i18n %}
 <!DOCTYPE html>
 <html dir="ltr" lang="en">
 
@@ -59,10 +59,36 @@
         
         <!-- Home -->
         <li>
+          <form action="{% url 'set_language' %}" method="post">
+    {% csrf_token %}
+    <select name="language" onchange="this.form.submit()">
+        <option value="en">English</option>
+        <option value="bn">বাংলা</option>
+    </select>
+</form>
+        </li>
+		<li>
           <a href="{% url 'properties:home' %}">
             <span class="title">Home</span>
           </a>
         </li>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		  
 
         <!-- Properties -->
         <li>
