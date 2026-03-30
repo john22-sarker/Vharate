@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 
@@ -27,9 +28,9 @@
                 {% endif %}
 
                 <!-- Heading -->
-                <div class="heading text-center mb-4">
-                    <h3>Verify OTP</h3>
-                    <p class="text-muted">
+                <div class="text-center mb-4">
+                    <h3 class="mb-2">Verify OTP</h3>
+                    <p class="text-muted mb-0">
                         Enter the OTP sent to your email
                     </p>
                 </div>
@@ -38,19 +39,20 @@
                 <form method="post">
                     {% csrf_token %}
 
-                    <div class="form-group mb-3">
-                        <label for="otp">OTP Code</label>
+                    <div class="mb-3">
+                        <label for="otp" class="form-label">OTP Code</label>
                         <input 
                             type="text" 
                             id="otp"
                             name="otp" 
                             class="form-control" 
-                            placeholder="Enter OTP" 
+                            placeholder="Enter OTP"
+                            autocomplete="off"
                             required
                         >
                     </div>
 
-                    <button type="submit" class="btn btn-thm2 btn-block w-100">
+                    <button type="submit" class="btn btn-thm2 w-100">
                         Verify OTP
                     </button>
                 </form>
