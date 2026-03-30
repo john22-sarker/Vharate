@@ -3,6 +3,8 @@ from django.contrib.auth import login, authenticate, logout, update_session_auth
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.core.mail import send_mail
+from .models import EmailOTP
 from django.contrib.auth.models import User
 
 from .forms import SignUpForm, ProfileUpdateForm
