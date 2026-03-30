@@ -18,9 +18,9 @@ from properties.models import Property
 # =============================
 
 def signup_view(request):
-    form = SignUpForm(request.POST or None)
+form = SignUpForm(request.POST or None)
 
-```
+
 if request.method == 'POST' and form.is_valid():
     user = form.save(commit=False)
     user.is_active = False
@@ -36,7 +36,7 @@ if request.method == 'POST' and form.is_valid():
     return redirect('accounts:verify_code')
 
 return render(request, 'accounts/signup.html', {'form': form})
-```
+ 
 
 # =============================
 
@@ -49,7 +49,7 @@ otp = request.session.get('otp')
 user_id = request.session.get('otp_user')
 otp_time = request.session.get('otp_time')
 
-```
+ 
 if not otp or not user_id or not otp_time:
     messages.error(request, "Session expired. Please sign up again.")
     return redirect('accounts:signup')
@@ -79,7 +79,7 @@ if request.method == 'POST':
         messages.error(request, "Invalid OTP.")
 
 return render(request, 'accounts/verify_code.html')
-```
+ 
 
 # =============================
 
@@ -92,7 +92,7 @@ if request.method == 'POST':
 username_input = request.POST.get('username')
 password = request.POST.get('password')
 
-```
+ 
     user_obj = User.objects.filter(email=username_input).first()
     username = user_obj.username if user_obj else username_input
 
@@ -109,7 +109,7 @@ password = request.POST.get('password')
     messages.error(request, "Invalid credentials.")
 
 return render(request, 'accounts/login.html')
-```
+ 
 
 # =============================
 
@@ -132,7 +132,7 @@ if request.method == 'POST':
 email = request.POST.get('email')
 user = User.objects.filter(email=email).first()
 
-```
+ 
     if user:
         otp_obj, _ = EmailOTP.objects.get_or_create(user=user)
         otp_obj.generate_otp()
@@ -146,7 +146,7 @@ user = User.objects.filter(email=email).first()
     messages.error(request, "Email not found.")
 
 return render(request, 'accounts/forgot_password.html')
-```
+ 
 
 # =============================
 
@@ -159,7 +159,7 @@ otp = request.session.get('reset_otp')
 user_id = request.session.get('reset_user')
 otp_time = request.session.get('reset_otp_time')
 
-```
+ 
 if not otp or not user_id or not otp_time:
     messages.error(request, "Session expired.")
     return redirect('accounts:forgot_password')
@@ -183,7 +183,7 @@ if request.method == 'POST':
         messages.error(request, "Invalid OTP.")
 
 return render(request, 'accounts/verify_reset_otp.html')
-```
+ 
 
 # =============================
 
@@ -195,7 +195,7 @@ def reset_password_view(request):
 user_id = request.session.get('reset_user')
 verified = request.session.get('otp_verified')
 
-```
+ 
 if not user_id or not verified:
     return redirect('accounts:forgot_password')
 
@@ -216,7 +216,7 @@ if request.method == 'POST':
     messages.error(request, "Passwords do not match.")
 
 return render(request, 'accounts/reset_password.html')
-```
+ 
 
 # =============================
 
@@ -228,7 +228,7 @@ return render(request, 'accounts/reset_password.html')
 def user_dashboard(request):
 profile, _ = UserProfile.objects.get_or_create(user=request.user)
 
-```
+ 
 profile_form = ProfileUpdateForm(
     request.POST or None,
     instance=profile,
@@ -279,7 +279,7 @@ context = {
 }
 
 return render(request, 'accounts/dashboard.html', context)
-```
+ 
 
 # =============================
 
@@ -291,19 +291,19 @@ return render(request, 'accounts/dashboard.html', context)
 def delete_property(request, id):
 property_obj = get_object_or_404(Property, id=id, owner=request.user)
 
-```
+ 
 if request.method == 'POST':
     property_obj.delete()
     messages.success(request, "Property deleted!")
 
 return redirect('accounts:user_dashboard')
-```
+ 
 
 @login_required
 def toggle_property(request, id):
 property_obj = get_object_or_404(Property, id=id, owner=request.user)
 
-```
+ 
 if request.method == 'POST':
     property_obj.is_published = not property_obj.is_published
     property_obj.save()
@@ -314,7 +314,7 @@ if request.method == 'POST':
         messages.success(request, "Property deactivated!")
 
 return redirect('accounts:user_dashboard')
-```
+ 
 
 @login_required
 def edit_property_redirect(request, id):
