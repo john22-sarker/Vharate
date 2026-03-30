@@ -26,7 +26,9 @@ def signup_view(request):
             otp_obj.generate_otp()
 
             print("OTP CODE:", otp_obj.otp)
-            messages.success(request, f"Your OTP is: {otp_obj.otp}")
+
+            # ✅ OTP session এ রাখি
+            request.session['otp'] = otp_obj.otp
 
             return redirect('accounts:verify_code')
         else:
@@ -39,6 +41,8 @@ def signup_view(request):
 # VERIFY OTP (SIGNUP)
 # =====================================
 def verify_code_view(request):
+    otp = request.session.get('otp')  # ✅ session থেকে OTP
+
     if request.method == 'POST':
         code = request.POST.get('otp')
 
@@ -55,15 +59,18 @@ def verify_code_view(request):
 
             otp_obj.delete()
 
+            # cleanup
+            request.session.pop('otp', None)
+
             messages.success(request, "Account verified successfully!")
             return redirect('accounts:login')
 
         except EmailOTP.DoesNotExist:
             messages.error(request, "Invalid OTP")
 
-   return render(request, 'accounts/verify_code.html', {
-    'otp': otp_obj.otp
-})
+    return render(request, 'accounts/verify_code.html', {
+        'otp': otp   # ✅ safe
+    })
 
 
 # =====================================
@@ -118,6 +125,8 @@ def forgot_password_view(request):
             print("RESET OTP:", otp_obj.otp)
 
             request.session['reset_user'] = user.id
+            request.session['reset_otp'] = otp_obj.otp  # ✅ store OTP
+
             return redirect('accounts:verify_reset_otp')
 
         else:
@@ -130,6 +139,8 @@ def forgot_password_view(request):
 # VERIFY RESET OTP (STEP 2)
 # =====================================
 def verify_reset_otp_view(request):
+    otp = request.session.get('reset_otp')
+
     if request.method == 'POST':
         code = request.POST.get('otp')
         user_id = request.session.get('reset_user')
@@ -137,16 +148,15 @@ def verify_reset_otp_view(request):
         if not user_id:
             return redirect('accounts:forgot_password')
 
-        try:
-            otp_obj = EmailOTP.objects.get(user_id=user_id, otp=code)
-
+        if code == otp:
             request.session['otp_verified'] = True
             return redirect('accounts:reset_password')
-
-        except EmailOTP.DoesNotExist:
+        else:
             messages.error(request, "Invalid OTP.")
 
-    return render(request, 'accounts/verify_reset_otp.html')
+    return render(request, 'accounts/verify_reset_otp.html', {
+        'otp': otp
+    })
 
 
 # =====================================
@@ -169,7 +179,6 @@ def reset_password_view(request):
             user.set_password(password)
             user.save()
 
-            # cleanup session
             request.session.flush()
 
             messages.success(request, "Password reset successful!")
@@ -185,7 +194,6 @@ def reset_password_view(request):
 # =====================================
 @login_required
 def user_dashboard(request):
-
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
 
     profile_form = ProfileUpdateForm(
@@ -199,9 +207,7 @@ def user_dashboard(request):
         data=request.POST or None
     )
 
-    properties = Property.objects.filter(
-        owner=request.user
-    ).order_by('-created_at')
+    properties = Property.objects.filter(owner=request.user).order_by('-created_at')
 
     if request.method == 'POST':
 
@@ -238,49 +244,6 @@ def user_dashboard(request):
         'profile_update_form': profile_form,
         'password_form': password_form,
         'properties': properties,
-        'total_properties': properties.count(),
-        'active_properties': properties.filter(is_published=True).count(),
-        'inactive_properties': properties.filter(is_published=False).count(),
     }
 
     return render(request, 'accounts/dashboard.html', context)
-
-
-# =====================================
-# DELETE PROPERTY
-# =====================================
-@login_required
-def delete_property(request, id):
-    property = get_object_or_404(Property, id=id, owner=request.user)
-
-    if request.method == 'POST':
-        property.delete()
-        messages.success(request, "Property deleted!")
-
-    return redirect('accounts:user_dashboard')
-
-
-# =====================================
-# TOGGLE PROPERTY
-# =====================================
-@login_required
-def toggle_property(request, id):
-    property = get_object_or_404(Property, id=id, owner=request.user)
-
-    if request.method == 'POST':
-        property.is_published = not property.is_published
-        property.save()
-
-        msg = "Activated!" if property.is_published else "Deactivated!"
-        messages.success(request, msg)
-
-    return redirect('accounts:user_dashboard')
-
-
-# =====================================
-# EDIT REDIRECT
-# =====================================
-@login_required
-def edit_property_redirect(request, id):
-    property = get_object_or_404(Property, id=id, owner=request.user)
-    return redirect('properties:property_edit', id=property.id)
