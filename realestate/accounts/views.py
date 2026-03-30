@@ -61,7 +61,9 @@ def verify_code_view(request):
         except EmailOTP.DoesNotExist:
             messages.error(request, "Invalid OTP")
 
-    return render(request, 'accounts/verify_code.html')
+   return render(request, 'accounts/verify_code.html', {
+    'otp': otp_obj.otp
+})
 
 
 # =====================================
