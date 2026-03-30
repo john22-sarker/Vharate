@@ -55,12 +55,15 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
 
+    # ✅ Language middleware (IMPORTANT)
+    'django.middleware.locale.LocaleMiddleware',
+
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
 
     'django.contrib.auth.middleware.AuthenticationMiddleware',
 
-    # Allauth (important)
+    # Allauth
     'allauth.account.middleware.AccountMiddleware',
 
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -86,27 +89,20 @@ LOGOUT_REDIRECT_URL = '/'
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 
-# ✅ EMAIL SETTINGS (UPDATED)
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 
-# 🔥 EMAIL VERIFICATION ON
 ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
-
-# 🔥 Prevent login before verification
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 
-# 🔥 Google direct login (NO signup page)
 SOCIALACCOUNT_AUTO_SIGNUP = True
 SOCIALACCOUNT_LOGIN_ON_GET = True
-
-# 🔥 Custom adapter (force skip signup)
 SOCIALACCOUNT_ADAPTER = 'accounts.adapter.MySocialAccountAdapter'
 
 
 # ===============================
-# EMAIL CONFIG (ADD THIS)
+# EMAIL CONFIG
 # ===============================
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
@@ -114,8 +110,8 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-EMAIL_HOST_USER = 'your_email@gmail.com'
-EMAIL_HOST_PASSWORD = 'your_app_password'
+EMAIL_HOST_USER = 'johnsarker790@gmail.com'
+EMAIL_HOST_PASSWORD = ''
 
 
 # ===============================
@@ -134,7 +130,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.request',  # required
+                'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
@@ -172,13 +168,25 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # ===============================
-# INTERNATIONALIZATION
+# INTERNATIONALIZATION ✅ UPDATED
 # ===============================
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en'
+
 TIME_ZONE = 'UTC'
 
 USE_I18N = True
 USE_TZ = True
+
+# ✅ Available languages
+LANGUAGES = [
+    ('en', 'English'),
+    ('bn', 'Bangla'),
+]
+
+# ✅ Translation files location
+LOCALE_PATHS = [
+    BASE_DIR / 'locale',
+]
 
 
 # ===============================
@@ -211,13 +219,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ===============================
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760
-
-
-
-
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'johnsarker790@gmail.com'
-EMAIL_HOST_PASSWORD = ''
