@@ -21,17 +21,47 @@ def signup_view(request):
     if request.method == 'POST':
         if form.is_valid():
             user = form.save()
+            user.is_active = False
+            user.save()
 
-            messages.success(
-                request,
-                "Account created successfully! Please check your email to verify your account."
+            # OTP create
+            otp_obj, _ = EmailOTP.objects.get_or_create(user=user)
+            otp_obj.generate_otp()
+
+            # send email
+            send_mail(
+                'Verify your account',
+                f'Your verification code is: {otp_obj.otp}',
+                'your_email@gmail.com',
+                [user.email],
+                fail_silently=False,
             )
 
-            return redirect('account_email_verification_sent')
-        else:
-            messages.error(request, "Please fix the errors below.")
+            return redirect('accounts:verify_code')
 
     return render(request, 'accounts/signup.html', {'form': form})
+
+def verify_code_view(request):
+    if request.method == 'POST':
+        code = request.POST.get('otp')
+
+        try:
+            otp_obj = EmailOTP.objects.get(otp=code)
+
+            user = otp_obj.user
+            user.is_active = True
+            user.save()
+
+            otp_obj.delete()
+
+            messages.success(request, "Account verified successfully!")
+            return redirect('accounts:login')
+
+        except EmailOTP.DoesNotExist:
+            messages.error(request, "Invalid OTP")
+
+    return render(request, 'accounts/verify_code.html')
+
 
 
 # =====================================
