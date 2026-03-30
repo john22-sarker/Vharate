@@ -11,11 +11,11 @@ from .forms import SignUpForm, ProfileUpdateForm
 from .models import UserProfile, EmailOTP
 from properties.models import Property
 
-# =====================================
+# =============================
 
 # USER REGISTRATION
 
-# =====================================
+# =============================
 
 def signup_view(request):
 form = SignUpForm(request.POST or None)
@@ -29,7 +29,6 @@ if request.method == 'POST' and form.is_valid():
     otp_obj, _ = EmailOTP.objects.get_or_create(user=user)
     otp_obj.generate_otp()
 
-    # Save OTP in session
     request.session['otp'] = str(otp_obj.otp)
     request.session['otp_user'] = user.id
     request.session['otp_time'] = timezone.now().isoformat()
@@ -39,11 +38,11 @@ if request.method == 'POST' and form.is_valid():
 return render(request, 'accounts/signup.html', {'form': form})
 ```
 
-# =====================================
+# =============================
 
 # VERIFY OTP (SIGNUP)
 
-# =====================================
+# =============================
 
 def verify_code_view(request):
 otp = request.session.get('otp')
@@ -55,7 +54,6 @@ if not otp or not user_id or not otp_time:
     messages.error(request, "Session expired. Please sign up again.")
     return redirect('accounts:signup')
 
-# OTP expiry (5 minutes)
 if timezone.now() > timezone.datetime.fromisoformat(otp_time) + timedelta(minutes=5):
     messages.error(request, "OTP expired.")
     return redirect('accounts:signup')
@@ -72,10 +70,7 @@ if request.method == 'POST':
         user.is_active = True
         user.save()
 
-        # clear session
-        request.session.pop('otp', None)
-        request.session.pop('otp_user', None)
-        request.session.pop('otp_time', None)
+        request.session.flush()
 
         messages.success(request, "Account verified!")
         return redirect('accounts:login')
@@ -86,11 +81,11 @@ if request.method == 'POST':
 return render(request, 'accounts/verify_code.html')
 ```
 
-# =====================================
+# =============================
 
 # LOGIN
 
-# =====================================
+# =============================
 
 def login_view(request):
 if request.method == 'POST':
@@ -116,21 +111,21 @@ password = request.POST.get('password')
 return render(request, 'accounts/login.html')
 ```
 
-# =====================================
+# =============================
 
 # LOGOUT
 
-# =====================================
+# =============================
 
 def logout_view(request):
 logout(request)
 return redirect('properties:home')
 
-# =====================================
+# =============================
 
 # FORGOT PASSWORD
 
-# =====================================
+# =============================
 
 def forgot_password_view(request):
 if request.method == 'POST':
@@ -153,11 +148,11 @@ user = User.objects.filter(email=email).first()
 return render(request, 'accounts/forgot_password.html')
 ```
 
-# =====================================
+# =============================
 
 # VERIFY RESET OTP
 
-# =====================================
+# =============================
 
 def verify_reset_otp_view(request):
 otp = request.session.get('reset_otp')
@@ -169,7 +164,6 @@ if not otp or not user_id or not otp_time:
     messages.error(request, "Session expired.")
     return redirect('accounts:forgot_password')
 
-# OTP expiry (5 minutes)
 if timezone.now() > timezone.datetime.fromisoformat(otp_time) + timedelta(minutes=5):
     messages.error(request, "OTP expired.")
     return redirect('accounts:forgot_password')
@@ -191,11 +185,11 @@ if request.method == 'POST':
 return render(request, 'accounts/verify_reset_otp.html')
 ```
 
-# =====================================
+# =============================
 
 # RESET PASSWORD
 
-# =====================================
+# =============================
 
 def reset_password_view(request):
 user_id = request.session.get('reset_user')
@@ -224,11 +218,11 @@ if request.method == 'POST':
 return render(request, 'accounts/reset_password.html')
 ```
 
-# =====================================
+# =============================
 
 # USER DASHBOARD
 
-# =====================================
+# =============================
 
 @login_required
 def user_dashboard(request):
@@ -287,11 +281,11 @@ context = {
 return render(request, 'accounts/dashboard.html', context)
 ```
 
-# =====================================
+# =============================
 
 # PROPERTY ACTIONS
 
-# =====================================
+# =============================
 
 @login_required
 def delete_property(request, id):
