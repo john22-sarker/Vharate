@@ -22,19 +22,18 @@ def signup_view(request):
             user.is_active = False
             user.save()
 
-            # OTP create
+            # Create OTP
             otp_obj, _ = EmailOTP.objects.get_or_create(user=user)
             otp_obj.generate_otp()
 
-            # ❌ EMAIL OFF (PythonAnywhere issue)
-            # send_mail(...)
-
-            # ✅ TEMP: show OTP in console/log
+            # 🔥 TEMP: show OTP (since email not working on hosting)
             print("OTP CODE:", otp_obj.otp)
-
-            messages.info(request, "Verification code sent to your email (check console for now).")
+            messages.success(request, f"Your OTP is: {otp_obj.otp}")
 
             return redirect('accounts:verify_code')
+
+        else:
+            messages.error(request, "Please fix the errors below.")
 
     return render(request, 'accounts/signup.html', {'form': form})
 
@@ -45,6 +44,10 @@ def signup_view(request):
 def verify_code_view(request):
     if request.method == 'POST':
         code = request.POST.get('otp')
+
+        if not code:
+            messages.error(request, "Please enter OTP.")
+            return redirect('accounts:verify_code')
 
         try:
             otp_obj = EmailOTP.objects.get(otp=code)
@@ -72,14 +75,14 @@ def login_view(request):
         username_input = request.POST.get('username')
         password = request.POST.get('password')
 
-        # allow login via email
+        # Allow login via email or username
         user_obj = User.objects.filter(email=username_input).first()
         username = user_obj.username if user_obj else username_input
 
         user = authenticate(request, username=username, password=password)
 
         if user:
-            # 🔥 OTP VERIFIED CHECK
+            # Check if verified (is_active)
             if not user.is_active:
                 messages.error(request, "Please verify your account first.")
                 return redirect('accounts:verify_code')
@@ -87,6 +90,7 @@ def login_view(request):
             login(request, user)
             messages.success(request, f"Welcome back, {user.username}!")
             return redirect('properties:home')
+
         else:
             messages.error(request, "Invalid username/email or password.")
 
@@ -127,10 +131,6 @@ def user_dashboard(request):
 
     if request.method == 'POST':
 
-        print("\n====== DEBUG ======")
-        print("POST:", request.POST)
-        print("FILES:", request.FILES)
-
         # PROFILE UPDATE
         if 'update_profile' in request.POST:
             if profile_form.is_valid():
@@ -138,6 +138,7 @@ def user_dashboard(request):
                 messages.success(request, "Profile updated successfully!")
             else:
                 messages.error(request, "Profile update failed!")
+
             return redirect('accounts:user_dashboard')
 
         # PHOTO UPDATE
@@ -168,7 +169,6 @@ def user_dashboard(request):
         'profile': profile,
         'profile_update_form': profile_form,
         'password_form': password_form,
-
         'properties': properties,
         'total_properties': properties.count(),
         'active_properties': properties.filter(is_published=True).count(),
@@ -193,7 +193,7 @@ def delete_property(request, id):
 
 
 # =====================================
-# TOGGLE ACTIVE / DEACTIVE
+# TOGGLE PROPERTY STATUS
 # =====================================
 @login_required
 def toggle_property(request, id):
