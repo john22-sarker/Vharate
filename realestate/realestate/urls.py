@@ -12,7 +12,7 @@ urlpatterns = [
 
 
     # ✅ Allauth (Google login only)
-    path('accounts/social/', include('allauth.urls')),
+    path('accounts/', include('allauth.urls')),
 ]
 
 
