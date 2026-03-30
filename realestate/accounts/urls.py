@@ -1,9 +1,10 @@
 from django.urls import path
-from . import views   # ✅ IMPORTANT
+from . import views
 
 app_name = 'accounts'
 
 urlpatterns = [
+
     # =============================
     # AUTHENTICATION
     # =============================
@@ -11,16 +12,20 @@ urlpatterns = [
     path('login/', views.login_view, name='login'),
     path('logout/', views.logout_view, name='logout'),
 
-    # 🔥 PASSWORD RESET FLOW
+    # =============================
+    # EMAIL VERIFICATION
+    # =============================
+    path('verify-code/', views.verify_code_view, name='verify_code'),
+
+    # =============================
+    # PASSWORD RESET
+    # =============================
     path('forgot-password/', views.forgot_password_view, name='forgot_password'),
     path('verify-reset-otp/', views.verify_reset_otp_view, name='verify_reset_otp'),
     path('reset-password/', views.reset_password_view, name='reset_password'),
 
-    # 🔥 EMAIL OTP VERIFY
-    path('verify-code/', views.verify_code_view, name='verify_code'),
-
     # =============================
-    # USER DASHBOARD
+    # DASHBOARD
     # =============================
     path('dashboard/', views.user_dashboard, name='user_dashboard'),
 
