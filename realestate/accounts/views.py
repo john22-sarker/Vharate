@@ -18,7 +18,7 @@ def signup_view(request):
 
     if request.method == 'POST':
         if form.is_valid():
-            user = form.save()
+            user = form.save(commit=False)
             user.is_active = False
             user.save()
 
@@ -27,12 +27,13 @@ def signup_view(request):
 
             print("OTP CODE:", otp_obj.otp)
 
-            # ✅ OTP session এ রাখি
+            # session এ store
             request.session['otp'] = otp_obj.otp
+            request.session['otp_user'] = user.id
 
             return redirect('accounts:verify_code')
-        else:
-            messages.error(request, "Please fix the errors below.")
+
+        messages.error(request, "Please fix the errors below.")
 
     return render(request, 'accounts/signup.html', {'form': form})
 
@@ -41,7 +42,12 @@ def signup_view(request):
 # VERIFY OTP (SIGNUP)
 # =====================================
 def verify_code_view(request):
-    otp = request.session.get('otp')  # ✅ session থেকে OTP
+    otp = request.session.get('otp')
+    user_id = request.session.get('otp_user')
+
+    if not otp or not user_id:
+        messages.error(request, "Session expired. Try again.")
+        return redirect('accounts:signup')
 
     if request.method == 'POST':
         code = request.POST.get('otp')
@@ -50,26 +56,26 @@ def verify_code_view(request):
             messages.error(request, "Please enter OTP.")
             return redirect('accounts:verify_code')
 
-        try:
-            otp_obj = EmailOTP.objects.get(otp=code)
+        if code == str(otp):
+            try:
+                user = User.objects.get(id=user_id)
+                user.is_active = True
+                user.save()
 
-            user = otp_obj.user
-            user.is_active = True
-            user.save()
+                # cleanup
+                request.session.pop('otp', None)
+                request.session.pop('otp_user', None)
 
-            otp_obj.delete()
+                messages.success(request, "Account verified successfully!")
+                return redirect('accounts:login')
 
-            # cleanup
-            request.session.pop('otp', None)
-
-            messages.success(request, "Account verified successfully!")
-            return redirect('accounts:login')
-
-        except EmailOTP.DoesNotExist:
-            messages.error(request, "Invalid OTP")
+            except User.DoesNotExist:
+                messages.error(request, "User not found.")
+        else:
+            messages.error(request, "Invalid OTP.")
 
     return render(request, 'accounts/verify_code.html', {
-        'otp': otp   # ✅ safe
+        'otp': otp   # ⚠️ only for testing
     })
 
 
@@ -94,8 +100,8 @@ def login_view(request):
             login(request, user)
             messages.success(request, f"Welcome back, {user.username}!")
             return redirect('properties:home')
-        else:
-            messages.error(request, "Invalid credentials.")
+
+        messages.error(request, "Invalid credentials.")
 
     return render(request, 'accounts/login.html')
 
@@ -125,12 +131,11 @@ def forgot_password_view(request):
             print("RESET OTP:", otp_obj.otp)
 
             request.session['reset_user'] = user.id
-            request.session['reset_otp'] = otp_obj.otp  # ✅ store OTP
+            request.session['reset_otp'] = otp_obj.otp
 
             return redirect('accounts:verify_reset_otp')
 
-        else:
-            messages.error(request, "Email not found.")
+        messages.error(request, "Email not found.")
 
     return render(request, 'accounts/forgot_password.html')
 
@@ -140,22 +145,23 @@ def forgot_password_view(request):
 # =====================================
 def verify_reset_otp_view(request):
     otp = request.session.get('reset_otp')
+    user_id = request.session.get('reset_user')
+
+    if not otp or not user_id:
+        messages.error(request, "Session expired.")
+        return redirect('accounts:forgot_password')
 
     if request.method == 'POST':
         code = request.POST.get('otp')
-        user_id = request.session.get('reset_user')
 
-        if not user_id:
-            return redirect('accounts:forgot_password')
-
-        if code == otp:
+        if code == str(otp):
             request.session['otp_verified'] = True
             return redirect('accounts:reset_password')
-        else:
-            messages.error(request, "Invalid OTP.")
+
+        messages.error(request, "Invalid OTP.")
 
     return render(request, 'accounts/verify_reset_otp.html', {
-        'otp': otp
+        'otp': otp   # ⚠️ testing only
     })
 
 
@@ -169,7 +175,11 @@ def reset_password_view(request):
     if not user_id or not verified:
         return redirect('accounts:forgot_password')
 
-    user = User.objects.get(id=user_id)
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        messages.error(request, "User not found.")
+        return redirect('accounts:forgot_password')
 
     if request.method == 'POST':
         password = request.POST.get('password')
@@ -183,8 +193,8 @@ def reset_password_view(request):
 
             messages.success(request, "Password reset successful!")
             return redirect('accounts:login')
-        else:
-            messages.error(request, "Passwords do not match.")
+
+        messages.error(request, "Passwords do not match.")
 
     return render(request, 'accounts/reset_password.html')
 
@@ -198,6 +208,7 @@ def user_dashboard(request):
 
     profile_form = ProfileUpdateForm(
         request.POST or None,
+        request.FILES or None,
         instance=profile,
         user=request.user
     )
@@ -217,17 +228,6 @@ def user_dashboard(request):
                 messages.success(request, "Profile updated!")
             else:
                 messages.error(request, "Update failed!")
-            return redirect('accounts:user_dashboard')
-
-        if 'update_photo' in request.POST:
-            photo = request.FILES.get('photo')
-
-            if photo:
-                profile.photo = photo
-                profile.save()
-                messages.success(request, "Photo updated!")
-            else:
-                messages.error(request, "No file selected!")
             return redirect('accounts:user_dashboard')
 
         if 'change_password' in request.POST:
