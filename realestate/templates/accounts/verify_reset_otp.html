@@ -2,49 +2,61 @@
 
 {% block content %}
 
-<section class="our-log bgc-fa">
+<section class="our-log bgc-fa py-5">
     <div class="container">
-        <div class="row">
-            <div class="col-sm-12 col-lg-6 offset-lg-3">
-                <div class="login_form inner_page">
-{% if messages %}
-    {% for message in messages %}
-        <div class="alert alert-{{ message.tags }} text-center">
-            {{ message }}
-        </div>
-    {% endfor %}
-{% endif %}
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-7">
+
 ```
+            <div class="login_form inner_page p-4 shadow rounded bg-white">
+
+                <!-- Messages -->
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} text-center">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <!-- OTP Display (ONLY FOR TESTING) -->
+                {% if otp %}
+                    <div class="alert alert-success text-center">
+                        Your OTP: <strong>{{ otp }}</strong>
+                    </div>
+                {% endif %}
+
+                <!-- Heading -->
+                <div class="heading text-center mb-4">
+                    <h3>Verify OTP</h3>
+                    <p class="text-muted">
+                        Enter the OTP sent to your email
+                    </p>
+                </div>
+
+                <!-- Form -->
                 <form method="post">
                     {% csrf_token %}
 
-                    <style>
-                        input {
-                            height: 40px;
-                            width: 100%;
-                        }
-                    </style>
-
-                    <div class="heading">
-                        <h3 class="text-center">Verify OTP</h3>
-                        <p class="text-center">
-                            Enter the OTP sent to your email
-                        </p>
+                    <div class="form-group mb-3">
+                        <label for="otp">OTP Code</label>
+                        <input 
+                            type="text" 
+                            id="otp"
+                            name="otp" 
+                            class="form-control" 
+                            placeholder="Enter OTP" 
+                            required
+                        >
                     </div>
 
-                    <label>OTP Code</label>
-                    <div class="form-group">
-                        <input type="text" name="otp" class="form-control" placeholder="Enter OTP" required>
-                    </div>
-
-                 
-
-                    <button type="submit" class="btn btn-log btn-block btn-thm2">
+                    <button type="submit" class="btn btn-thm2 btn-block w-100">
                         Verify OTP
                     </button>
-
                 </form>
+
             </div>
+
         </div>
     </div>
 </div>
