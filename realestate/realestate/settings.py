@@ -21,7 +21,7 @@ ALLOWED_HOSTS = ['varate.pythonanywhere.com']
 # APPLICATIONS
 # ===============================
 INSTALLED_APPS = [
-    # Default Django
+    # Django default
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -29,15 +29,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Sites (required)
+    # Required
     'django.contrib.sites',
 
-    # Allauth core
+    # Allauth
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-
-    # Providers
     'allauth.socialaccount.providers.google',
 
     # Your apps
@@ -62,7 +60,7 @@ MIDDLEWARE = [
 
     'django.contrib.auth.middleware.AuthenticationMiddleware',
 
-    # Allauth middleware (important)
+    # Allauth (important)
     'allauth.account.middleware.AccountMiddleware',
 
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -80,47 +78,25 @@ AUTHENTICATION_BACKENDS = [
 
 
 # ===============================
-# ALLAUTH SETTINGS (🔥 IMPORTANT)
+# ALLAUTH SETTINGS
 # ===============================
-
-# Login redirect
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
-# Email ভিত্তিক login
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 
-# 🔥 Disable signup form (Google direct login)
-SOCIALACCOUNT_AUTO_SIGNUP = True
-SOCIALACCOUNT_LOGIN_ON_GET = True
-
-# 🔥 No extra पूछताछ
 ACCOUNT_EMAIL_REQUIRED = False
 ACCOUNT_USERNAME_REQUIRED = False
-SOCIALACCOUNT_EMAIL_REQUIRED = False
-
-# 🔥 Optional (better UX)
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
+# 🔥 Google direct login (NO signup page)
+SOCIALACCOUNT_AUTO_SIGNUP = True
+SOCIALACCOUNT_LOGIN_ON_GET = True
 
+# 🔥 Custom adapter (force skip signup)
 SOCIALACCOUNT_ADAPTER = 'accounts.adapter.MySocialAccountAdapter'
-
-# ===============================
-# GOOGLE CONFIG (🔥 MUST)
-# ===============================
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'APP': {
-            'client_id': '958422215051-lul6cnnob1it55ctss0fb5h29i5l6eq9.apps.googleusercontent.com',
-            'secret': 'YOUR_GOOGLE_SECRET',
-            'key': ''
-        },
-        'SCOPE': ['profile', 'email'],
-        'AUTH_PARAMS': {'access_type': 'online'},
-    }
-}
 
 
 # ===============================
@@ -135,7 +111,7 @@ ROOT_URLCONF = 'realestate.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # custom templates
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -206,13 +182,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # ===============================
-# DEFAULT PRIMARY KEY
+# DEFAULT PK
 # ===============================
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 # ===============================
-# EXTRA LIMITS
+# FILE LIMITS
 # ===============================
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760
