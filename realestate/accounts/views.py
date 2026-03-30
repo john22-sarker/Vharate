@@ -72,13 +72,8 @@ def verify_code_view(request):
             messages.error(request, "Invalid OTP.")
 
     return render(request, 'accounts/verify_code.html', {
+        'otp': otp  # ⚠️ testing only (later remove)
     })
-
-
-
-
-
-
 def verify_reset_otp_view(request):
     otp = request.session.get('reset_otp')
     user_id = request.session.get('reset_user')
@@ -105,7 +100,9 @@ def verify_reset_otp_view(request):
             messages.error(request, "Invalid OTP.")
 
     return render(request, 'accounts/verify_reset_otp.html', {
+        'otp': otp  # ⚠️ testing only
     })
+
 
 
 # =====================================
