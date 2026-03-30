@@ -86,10 +86,16 @@ LOGOUT_REDIRECT_URL = '/'
 ACCOUNT_LOGIN_METHODS = {'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
 
-ACCOUNT_EMAIL_REQUIRED = False
+# ✅ EMAIL SETTINGS (UPDATED)
+ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
-ACCOUNT_EMAIL_VERIFICATION = 'none'
+
+# 🔥 EMAIL VERIFICATION ON
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+
+# 🔥 Prevent login before verification
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 
 # 🔥 Google direct login (NO signup page)
 SOCIALACCOUNT_AUTO_SIGNUP = True
@@ -97,6 +103,19 @@ SOCIALACCOUNT_LOGIN_ON_GET = True
 
 # 🔥 Custom adapter (force skip signup)
 SOCIALACCOUNT_ADAPTER = 'accounts.adapter.MySocialAccountAdapter'
+
+
+# ===============================
+# EMAIL CONFIG (ADD THIS)
+# ===============================
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = 'your_email@gmail.com'
+EMAIL_HOST_PASSWORD = 'your_app_password'
 
 
 # ===============================
