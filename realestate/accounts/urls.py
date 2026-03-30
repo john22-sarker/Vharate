@@ -32,7 +32,7 @@ urlpatterns = [
     # =============================
     # PROPERTY MANAGEMENT
     # =============================
-    # path('property/delete/<int:id>/', views.delete_property, name='delete_property'),
+    path('property/delete/<int:id>/', views.delete_property, name='delete_property'),
     path('property/toggle/<int:id>/', views.toggle_property, name='toggle_property'),
     path('property/edit/<int:id>/', views.edit_property_redirect, name='edit_property'),
 ]
