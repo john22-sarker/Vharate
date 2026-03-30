@@ -3,12 +3,10 @@ from django.contrib.auth import login, authenticate, logout, update_session_auth
 from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.core.mail import send_mail
-from .models import EmailOTP
 from django.contrib.auth.models import User
 
 from .forms import SignUpForm, ProfileUpdateForm
-from .models import UserProfile
+from .models import UserProfile, EmailOTP
 from properties.models import Property
 
 
@@ -28,19 +26,22 @@ def signup_view(request):
             otp_obj, _ = EmailOTP.objects.get_or_create(user=user)
             otp_obj.generate_otp()
 
-            # send email
-            send_mail(
-                'Verify your account',
-                f'Your verification code is: {otp_obj.otp}',
-                'your_email@gmail.com',
-                [user.email],
-                fail_silently=False,
-            )
+            # ❌ EMAIL OFF (PythonAnywhere issue)
+            # send_mail(...)
+
+            # ✅ TEMP: show OTP in console/log
+            print("OTP CODE:", otp_obj.otp)
+
+            messages.info(request, "Verification code sent to your email (check console for now).")
 
             return redirect('accounts:verify_code')
 
     return render(request, 'accounts/signup.html', {'form': form})
 
+
+# =====================================
+# VERIFY OTP
+# =====================================
 def verify_code_view(request):
     if request.method == 'POST':
         code = request.POST.get('otp')
@@ -54,14 +55,13 @@ def verify_code_view(request):
 
             otp_obj.delete()
 
-            messages.success(request, "Account verified successfully!")
+            messages.success(request, "Account verified successfully! You can now login.")
             return redirect('accounts:login')
 
         except EmailOTP.DoesNotExist:
             messages.error(request, "Invalid OTP")
 
     return render(request, 'accounts/verify_code.html')
-
 
 
 # =====================================
@@ -79,10 +79,10 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
 
         if user:
-            # 🔥 EMAIL VERIFICATION CHECK
-            if not user.emailaddress_set.filter(verified=True).exists():
-                messages.error(request, "Please verify your email before logging in.")
-                return redirect('account_login')
+            # 🔥 OTP VERIFIED CHECK
+            if not user.is_active:
+                messages.error(request, "Please verify your account first.")
+                return redirect('accounts:verify_code')
 
             login(request, user)
             messages.success(request, f"Welcome back, {user.username}!")
@@ -110,74 +110,60 @@ def user_dashboard(request):
 
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
 
-    # PROFILE FORM
     profile_form = ProfileUpdateForm(
         request.POST or None,
         instance=profile,
         user=request.user
     )
 
-    # PASSWORD FORM
     password_form = PasswordChangeForm(
         user=request.user,
         data=request.POST or None
     )
 
-    # USER PROPERTIES
     properties = Property.objects.filter(
         owner=request.user
     ).order_by('-created_at')
 
-    # =====================================
-    # HANDLE POST REQUESTS
-    # =====================================
     if request.method == 'POST':
 
         print("\n====== DEBUG ======")
         print("POST:", request.POST)
         print("FILES:", request.FILES)
 
-        # ---------- PROFILE UPDATE ----------
+        # PROFILE UPDATE
         if 'update_profile' in request.POST:
             if profile_form.is_valid():
                 profile_form.save(user=request.user)
                 messages.success(request, "Profile updated successfully!")
             else:
-                print("PROFILE ERRORS:", profile_form.errors)
                 messages.error(request, "Profile update failed!")
-
             return redirect('accounts:user_dashboard')
 
-        # ---------- PHOTO UPDATE ----------
+        # PHOTO UPDATE
         if 'update_photo' in request.POST:
             photo = request.FILES.get('photo')
 
             if photo:
                 profile.photo = photo
                 profile.save()
-                print("SAVED:", profile.photo.path)
                 messages.success(request, "Profile photo updated!")
             else:
-                print("NO FILE RECEIVED")
                 messages.error(request, "No file selected!")
 
             return redirect('accounts:user_dashboard')
 
-        # ---------- PASSWORD CHANGE ----------
+        # PASSWORD CHANGE
         if 'change_password' in request.POST:
             if password_form.is_valid():
                 user = password_form.save()
                 update_session_auth_hash(request, user)
                 messages.success(request, "Password changed successfully!")
             else:
-                print("PASSWORD ERRORS:", password_form.errors)
                 messages.error(request, "Fix password errors!")
 
             return redirect('accounts:user_dashboard')
 
-    # =====================================
-    # CONTEXT
-    # =====================================
     context = {
         'profile': profile,
         'profile_update_form': profile_form,
