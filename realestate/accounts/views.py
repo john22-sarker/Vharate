@@ -255,10 +255,10 @@ def user_dashboard(request):
 # =====================================
 @login_required
 def delete_property(request, id):
-    property = get_object_or_404(Property, id=id, owner=request.user)
+    property_obj = get_object_or_404(Property, id=id, owner=request.user)
 
     if request.method == 'POST':
-        property.delete()
+        property_obj.delete()
         messages.success(request, "Property deleted successfully!")
 
     return redirect('accounts:user_dashboard')
@@ -269,13 +269,13 @@ def delete_property(request, id):
 # =====================================
 @login_required
 def toggle_property(request, id):
-    property = get_object_or_404(Property, id=id, owner=request.user)
+    property_obj = get_object_or_404(Property, id=id, owner=request.user)
 
     if request.method == 'POST':
-        property.is_published = not property.is_published
-        property.save()
+        property_obj.is_published = not property_obj.is_published
+        property_obj.save()
 
-        if property.is_published:
+        if property_obj.is_published:
             messages.success(request, "Property activated!")
         else:
             messages.success(request, "Property deactivated!")
@@ -288,5 +288,5 @@ def toggle_property(request, id):
 # =====================================
 @login_required
 def edit_property_redirect(request, id):
-    property = get_object_or_404(Property, id=id, owner=request.user)
-    return redirect('properties:property_edit', id=property.id)
+    property_obj = get_object_or_404(Property, id=id, owner=request.user)
+    return redirect('properties:property_edit', id=property_obj.id)
