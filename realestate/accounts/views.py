@@ -16,24 +16,20 @@ from properties.models import Property
 def signup_view(request):
     form = SignUpForm(request.POST or None)
 
-    if request.method == 'POST':
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.is_active = False
-            user.save()
+    if request.method == 'POST' and form.is_valid():
+        user = form.save(commit=False)
+        user.is_active = False
+        user.save()
 
-            otp_obj, _ = EmailOTP.objects.get_or_create(user=user)
-            otp_obj.generate_otp()
+        otp_obj, _ = EmailOTP.objects.get_or_create(user=user)
+        otp_obj.generate_otp()
 
-            print("OTP CODE:", otp_obj.otp)
+        print("OTP CODE:", otp_obj.otp)
 
-            # session এ store
-            request.session['otp'] = otp_obj.otp
-            request.session['otp_user'] = user.id
+        request.session['otp'] = otp_obj.otp
+        request.session['otp_user'] = user.id
 
-            return redirect('accounts:verify_code')
-
-        messages.error(request, "Please fix the errors below.")
+        return redirect('accounts:verify_code')
 
     return render(request, 'accounts/signup.html', {'form': form})
 
@@ -46,15 +42,11 @@ def verify_code_view(request):
     user_id = request.session.get('otp_user')
 
     if not otp or not user_id:
-        messages.error(request, "Session expired. Try again.")
+        messages.error(request, "Session expired. Please sign up again.")
         return redirect('accounts:signup')
 
     if request.method == 'POST':
         code = request.POST.get('otp')
-
-        if not code:
-            messages.error(request, "Please enter OTP.")
-            return redirect('accounts:verify_code')
 
         if code == str(otp):
             try:
@@ -62,7 +54,6 @@ def verify_code_view(request):
                 user.is_active = True
                 user.save()
 
-                # cleanup
                 request.session.pop('otp', None)
                 request.session.pop('otp_user', None)
 
@@ -74,9 +65,7 @@ def verify_code_view(request):
         else:
             messages.error(request, "Invalid OTP.")
 
-    return render(request, 'accounts/verify_code.html', {
-        'otp': otp   # ⚠️ only for testing
-    })
+    return render(request, 'accounts/verify_code.html')
 
 
 # =====================================
@@ -116,12 +105,11 @@ def logout_view(request):
 
 
 # =====================================
-# FORGOT PASSWORD (STEP 1)
+# FORGOT PASSWORD
 # =====================================
 def forgot_password_view(request):
     if request.method == 'POST':
         email = request.POST.get('email')
-
         user = User.objects.filter(email=email).first()
 
         if user:
@@ -141,7 +129,7 @@ def forgot_password_view(request):
 
 
 # =====================================
-# VERIFY RESET OTP (STEP 2)
+# VERIFY RESET OTP
 # =====================================
 def verify_reset_otp_view(request):
     otp = request.session.get('reset_otp')
@@ -160,13 +148,11 @@ def verify_reset_otp_view(request):
 
         messages.error(request, "Invalid OTP.")
 
-    return render(request, 'accounts/verify_reset_otp.html', {
-        'otp': otp   # ⚠️ testing only
-    })
+    return render(request, 'accounts/verify_reset_otp.html')
 
 
 # =====================================
-# RESET PASSWORD (STEP 3)
+# RESET PASSWORD
 # =====================================
 def reset_password_view(request):
     user_id = request.session.get('reset_user')
@@ -190,7 +176,6 @@ def reset_password_view(request):
             user.save()
 
             request.session.flush()
-
             messages.success(request, "Password reset successful!")
             return redirect('accounts:login')
 
@@ -204,82 +189,58 @@ def reset_password_view(request):
 # =====================================
 @login_required
 def user_dashboard(request):
-
     profile, _ = UserProfile.objects.get_or_create(user=request.user)
 
-    # ✅ PROFILE FORM (NO FILES HERE)
     profile_form = ProfileUpdateForm(
         request.POST or None,
         instance=profile,
         user=request.user
     )
 
-    # ✅ PASSWORD FORM
     password_form = PasswordChangeForm(
         user=request.user,
         data=request.POST or None
     )
 
-    # ✅ USER PROPERTIES
-    properties = Property.objects.filter(
-        owner=request.user
-    ).order_by('-created_at')
+    properties = Property.objects.filter(owner=request.user).order_by('-created_at')
 
-    # =====================================
-    # HANDLE POST REQUESTS
-    # =====================================
     if request.method == 'POST':
 
-        print("\n====== DEBUG ======")
-        print("POST:", request.POST)
-        print("FILES:", request.FILES)
-
-        # ---------- PROFILE UPDATE ----------
+        # PROFILE UPDATE
         if 'update_profile' in request.POST:
             if profile_form.is_valid():
                 profile_form.save(user=request.user)
                 messages.success(request, "Profile updated successfully!")
             else:
-                print("PROFILE ERRORS:", profile_form.errors)
                 messages.error(request, "Profile update failed!")
-
             return redirect('accounts:user_dashboard')
 
-        # ---------- PHOTO UPDATE ----------
+        # PHOTO UPDATE
         if 'update_photo' in request.POST:
             photo = request.FILES.get('photo')
 
             if photo:
                 profile.photo = photo
                 profile.save()
-                print("SAVED:", profile.photo.path)
                 messages.success(request, "Profile photo updated!")
             else:
-                print("NO FILE RECEIVED")
                 messages.error(request, "No file selected!")
-
             return redirect('accounts:user_dashboard')
 
-        # ---------- PASSWORD CHANGE ----------
+        # PASSWORD CHANGE
         if 'change_password' in request.POST:
             if password_form.is_valid():
                 user = password_form.save()
                 update_session_auth_hash(request, user)
                 messages.success(request, "Password changed successfully!")
             else:
-                print("PASSWORD ERRORS:", password_form.errors)
                 messages.error(request, "Fix password errors!")
-
             return redirect('accounts:user_dashboard')
 
-    # =====================================
-    # CONTEXT
-    # =====================================
     context = {
         'profile': profile,
         'profile_update_form': profile_form,
         'password_form': password_form,
-
         'properties': properties,
         'total_properties': properties.count(),
         'active_properties': properties.filter(is_published=True).count(),
@@ -304,7 +265,7 @@ def delete_property(request, id):
 
 
 # =====================================
-# TOGGLE ACTIVE / DEACTIVE
+# TOGGLE PROPERTY STATUS
 # =====================================
 @login_required
 def toggle_property(request, id):
